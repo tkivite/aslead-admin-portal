@@ -12,7 +12,7 @@ import {
 } from "@/types/api.types";
 import axios from "axios";
 
-const BASE_URL = "http://80.209.230.177:6001/api";
+const BASE_URL = "https://gateway.itiksolutions.com/aslead";
 
 // Create axios instance with default config
 const api = axios.create({
@@ -52,13 +52,12 @@ api.interceptors.response.use(
           return Promise.reject(error);
         }
 
-    
         const response = await fetch(
-          "http://80.209.230.177:5999/aslead/api/v1/auth/refresh",
+          "hhttps://gateway.itiksolutions.com/aslead/auth/api/v1/refresh",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refresh_token : refreshToken }),
+            body: JSON.stringify({ refresh_token: refreshToken }),
           }
         );
 
@@ -68,7 +67,6 @@ api.interceptors.response.use(
         localStorage.setItem("access_token", access_token);
         originalRequest.headers.Authorization = `${access_token}`;
         return api(originalRequest);
-
       } catch (refreshError) {
         // Refresh token failed, redirect to login
         window.location.href = "/login";
@@ -83,7 +81,7 @@ api.interceptors.response.use(
 export const authService = {
   login: async (username: string, password: string): Promise<AuthResponse> => {
     const response = await fetch(
-      "http://80.209.230.177:5999/aslead/api/v1/auth/login",
+      "https://gateway.itiksolutions.com/aslead/auth/api/v1/login",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -107,7 +105,7 @@ export const applicationsService = {
     size = 10
   ): Promise<PageResponse<Application>> => {
     const response = await api.get<ApiResponse<PageResponse<Application>>>(
-      `/applications?page=${page}&size=${size}`
+      `/application/api/applications?page=${page}&size=${size}`
     );
     return response.data.body;
   },
@@ -124,7 +122,7 @@ export const applicationsService = {
       enrollmentStatus,
       enrolledAt,
     };
-    const response = await api.post("/offers/new", payload);
+    const response = await api.post("/application/api/offers/new", payload);
     return response.data;
   },
 };
@@ -133,13 +131,13 @@ export const applicationsService = {
 export const programsService = {
   getPrograms: async (page = 0, size = 10): Promise<PageResponse<Program>> => {
     const response = await api.get<ApiResponse<PageResponse<Program>>>(
-      `programs?action=fetch&page=${page}&size=${size}`
+      `/application/api/programs?action=fetch&page=${page}&size=${size}`
     );
     return response.data.body;
   },
 
   createProgram: async (programData: ProgramCreateRequest) => {
-    const response = await api.post("/programs", programData);
+    const response = await api.post("/application/api/programs", programData);
     return response.data;
   },
 
@@ -147,12 +145,15 @@ export const programsService = {
     programId: number,
     programData: Partial<ProgramCreateRequest>
   ) => {
-    const response = await api.put(`/programs/${programId}`, programData);
+    const response = await api.put(
+      `/application/api/programs/${programId}`,
+      programData
+    );
     return response.data;
   },
 
   deleteProgram: async (programId: number) => {
-    const response = await api.delete(`/programs/${programId}`);
+    const response = await api.delete(`/application/api/programs/${programId}`);
     return response.data;
   },
 };
@@ -164,13 +165,16 @@ export const admissionCyclesService = {
     size = 10
   ): Promise<PageResponse<AdmissionCycle>> => {
     const response = await api.get<ApiResponse<PageResponse<AdmissionCycle>>>(
-      `/admissionCycles?page=${page}&size=${size}`
+      `/application/api/admissionCycles?page=${page}&size=${size}`
     );
     return response.data.body;
   },
 
   createAdmissionCycle: async (cycleData: AdmissionCycleCreateRequest) => {
-    const response = await api.post("/admission-cycles", cycleData);
+    const response = await api.post(
+      "/application/api/admission-cycles",
+      cycleData
+    );
     return response.data;
   },
 
@@ -178,12 +182,17 @@ export const admissionCyclesService = {
     cycleId: number,
     cycleData: Partial<AdmissionCycleCreateRequest>
   ) => {
-    const response = await api.put(`/admission-cycles/${cycleId}`, cycleData);
+    const response = await api.put(
+      `/application/admission-cycles/${cycleId}`,
+      cycleData
+    );
     return response.data;
   },
 
   deleteAdmissionCycle: async (cycleId: number) => {
-    const response = await api.delete(`/admission-cycles/${cycleId}`);
+    const response = await api.delete(
+      `/application/api/admission-cycles/${cycleId}`
+    );
     return response.data;
   },
 };
@@ -191,22 +200,22 @@ export const admissionCyclesService = {
 // Users services
 export const usersService = {
   getUsers: async (page = 0, size = 10) => {
-    const response = await api.get(`/users?page=${page}&size=${size}`);
+    const response = await api.get(`/api/v1/users?page=${page}&size=${size}`);
     return response.data;
   },
 
   createUser: async (userData: UserCreateRequest) => {
-    const response = await api.post("/users", userData);
+    const response = await api.post("/api/v1//users", userData);
     return response.data;
   },
 
   updateUser: async (userId: number, userData: Partial<UserCreateRequest>) => {
-    const response = await api.put(`/users/${userId}`, userData);
+    const response = await api.put(`/api/v1//users/${userId}`, userData);
     return response.data;
   },
 
   deleteUser: async (userId: number) => {
-    const response = await api.delete(`/users/${userId}`);
+    const response = await api.delete(`/api/v1/users/${userId}`);
     return response.data;
   },
 };
