@@ -90,7 +90,7 @@ export default function UsersPage() {
         phone: user.phone,
         role: user.role,
         status: user.status,
-        password: "", // Don't populate password for security
+        password: "", 
       })
       setEditingUser(userId)
       setShowAddUserForm(true)
@@ -105,7 +105,7 @@ export default function UsersPage() {
   // Confirm delete user
   const confirmDeleteUser = () => {
     if (showDeleteConfirm) {
-      // In a real application, this would call an API to delete the user
+      
       alert(`User ${showDeleteConfirm} has been deleted`)
       setShowDeleteConfirm(null)
     }
@@ -131,10 +131,10 @@ export default function UsersPage() {
     }
 
     if (editingUser) {
-      // In a real application, this would call an API to update the user
+     
       alert(`User ${editingUser} has been updated`)
     } else {
-      // In a real application, this would call an API to create a new user
+     
       alert("New user has been created")
     }
 

@@ -5,13 +5,10 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Bell, LogOut,  Settings, Trash2, User, X } from "lucide-react"
+import { /* Bell ,*/ LogOut, /*  Settings, */ Trash2, User, X } from "lucide-react"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks"
+import { deleteUser } from "@/lib/features/userSlice"
 
-interface User {
-  email: string
-  role: string
-  name: string
-}
 
 
 // Mock notifications data
@@ -21,7 +18,7 @@ const initialNotifications = [
   { id: "3", title: "System update completed", time: "Yesterday" },
 ]
 
-export default function Header({ user }: { user: User|null }) {
+export default function Header() {
   const [showProfile, setShowProfile] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
 
@@ -30,18 +27,23 @@ export default function Header({ user }: { user: User|null }) {
 
   const profileRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
+  const user = useAppSelector((state) => state.user.value)
+  const dispatch = useAppDispatch()
 
 
 
   // Handle profile navigation
-  const handleProfileNavigation = (path: string) => {
+/*   const handleProfileNavigation = (path: string) => {
     setShowProfile(false)
     router.push(path)
-  }
+  } */
 
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("user")
+    localStorage.removeItem("accessTokenSite")
+    localStorage.removeItem("refreshTokenSite")
+    dispatch(deleteUser())
     router.push("/login")
   }
 
@@ -91,7 +93,7 @@ export default function Header({ user }: { user: User|null }) {
 
       <div className="flex items-center space-x-4">
         <div className="relative" ref={notificationRef}>
-          <button
+         {/*  <button
             onClick={() => setShowNotifications(!showNotifications)}
             className="relative p-2 rounded-full hover:bg-backgroundsecondary transition-colors"
           >
@@ -99,7 +101,7 @@ export default function Header({ user }: { user: User|null }) {
             {notifications.length > 0 && (
               <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
             )}
-          </button>
+          </button> */}
 
           {showNotifications && (
             <motion.div
@@ -161,7 +163,7 @@ export default function Header({ user }: { user: User|null }) {
             <div className="w-8 h-8 bg-tertiary rounded-full flex items-center justify-center text-white">
               <User size={18} />
             </div>
-            <span className="font-medium">{user?.name || "Admin User"}</span>
+            <span className="font-medium">{user?.username || "Admin User"}</span>
           </button>
 
           {showProfile && (
@@ -171,7 +173,7 @@ export default function Header({ user }: { user: User|null }) {
               transition={{ duration: 0.2 }}
               className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10"
             >
-              <button
+              {/* <button
                 onClick={() => handleProfileNavigation("/profile")}
                 className="flex items-center w-full text-left px-4 py-2 text-sm hover:bg-backgroundsecondary"
               >
@@ -184,7 +186,7 @@ export default function Header({ user }: { user: User|null }) {
               >
                 <Settings size={16} className="mr-2" />
                 Account Settings
-              </button>
+              </button> */}
               <div className="border-t border-gray-100 my-1"></div>
               <button
                 onClick={handleLogout}

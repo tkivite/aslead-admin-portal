@@ -7,18 +7,20 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
-  BookOpen,
-  Calendar,
+/*   BookOpen,
+  Calendar, */
   ChevronDown,
   ClipboardList,
   CreditCard,
-  FileText,
+/*   FileText, */
   Home,
-  MessageSquare,
-  Settings,
+ /*  MessageSquare,
+  Settings, */
   Users,
   UserCog,
+  Smartphone
 } from "lucide-react"
+import { useAppSelector } from "@/lib/hooks"
 
 // Define role-based access permissions
 const rolePermissions = {
@@ -33,6 +35,12 @@ const rolePermissions = {
     "settings",
     "payments",
     "finance",
+    "pending-applications",
+    "enrolled-students",
+    "exited-students",
+    "all-payments",
+    "mpesa-payments",
+    "student-statements",
   ],
   finance: ["dashboard", "students", "payments", "finance"],
   instructor: ["dashboard", "students", "courses", "messaging"],
@@ -48,105 +56,135 @@ type MenuItem = {
 }
 
 export default function Sidebar({ userRole = "admin" }: { userRole?: string }) {
+
   const pathname = usePathname()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const user = useAppSelector((state) => state.user.value)
 
   // Get permissions for the current user role
   const permissions = rolePermissions[userRole as keyof typeof rolePermissions] || []
 
-  const menuItems: MenuItem[] = [
-    {
-      name: "Dashboard",
-      path: "/",
-      icon: Home,
-      key: "dashboard",
-    },
-    {
-      name: "Students",
-      path: "/students",
-      icon: Users,
-      key: "students",
-    },
-    {
-      name: "Courses",
-      path: "/courses",
-      icon: BookOpen,
-      key: "courses",
-    },
-    {
-      name: "Applications",
-      path: "/applications",
-      icon: ClipboardList,
-      key: "applications",
-    },
-    {
-      name: "Messaging",
-      path: "/messaging",
-      icon: MessageSquare,
-      key: "messaging",
-    },
-    {
-      name: "User Management",
-      path: "#",
-      icon: UserCog,
-      key: "user-management",
-      submenu: [
-        {
-          name: "Users",
-          path: "/users",
-          icon: Users,
-          key: "users",
-        },
-        {
-          name: "Roles",
-          path: "/roles",
-          icon: UserCog,
-          key: "roles",
-        },
-      ],
-    },
-    {
-      name: "System",
-      path: "#",
-      icon: Settings,
-      key: "system",
-      submenu: [
-        {
-          name: "Settings",
-          path: "/settings",
-          icon: Settings,
-          key: "settings",
-        },
-      ],
-    },
-    {
-      name: "Finance",
-      path: "#",
-      icon: CreditCard,
-      key: "finance-menu",
-      submenu: [
-        {
-          name: "Payments",
-          path: "/payments",
-          icon: CreditCard,
-          key: "payments",
-        },
-      
-      ],
-    },
-    {
-      name: "Reports",
-      path: "/reports",
-      icon: FileText,
-      key: "reports",
-    },
-    {
-      name: "Calendar",
-      path: "/calendar",
-      icon: Calendar,
-      key: "calendar",
-    },
-  ]
+
+const menuItems: MenuItem[] = [
+  {
+    name: "Dashboard",
+    path: "/",
+    icon: Home,
+    key: "dashboard",
+  },
+  {
+    name: "Students",
+    path: "#",
+    icon: Users,
+    key: "students",
+    submenu: [
+      {
+        name: "Pending Applications",
+        path: "/students/pending-applications",
+        icon: ClipboardList,
+        key: "pending-applications",
+      },
+      {
+        name: "Enrolled Students",
+        path: "/students/enrolled-students",
+        icon: Users,
+        key: "enrolled-students",
+      },
+      {
+        name: "Exited Students",
+        path: "/students/exited-students",
+        icon: UserCog,
+        key: "exited-students",
+      },
+    ],
+  },
+ /*  {
+    name: "Courses",
+    path: "/courses",
+    icon: BookOpen,
+    key: "courses",
+  },
+
+  {
+    name: "Messaging",
+    path: "/messaging",
+    icon: MessageSquare,
+    key: "messaging",
+  }, */
+  {
+    name: "Finance",
+    path: "#",
+    icon: CreditCard,
+    key: "finance",
+    submenu: [
+      {
+        name: "All Payments",
+        path: "/finance/all-payments",
+        icon: CreditCard,
+        key: "all-payments",
+      },
+      {
+        name: "MPESA Payments",
+        path: "/finance/mpesa-payments",
+        icon: Smartphone,
+        key: "mpesa-payments",
+      },
+    /*   {
+        name: "Student Statements",
+        path: "/finance/student-statements",
+        icon: FileText,
+        key: "student-statements",
+      }, */
+    ],
+  },
+  /* {
+    name: "User Management",
+    path: "#",
+    icon: UserCog,
+    key: "user-management",
+    submenu: [
+      {
+        name: "Users",
+        path: "/users",
+        icon: Users,
+        key: "users",
+      },
+      {
+        name: "Roles",
+        path: "/roles",
+        icon: UserCog,
+        key: "roles",
+      },
+    ],
+  },
+  {
+    name: "System",
+    path: "#",
+    icon: Settings,
+    key: "system",
+    submenu: [
+      {
+        name: "Settings",
+        path: "/settings",
+        icon: Settings,
+        key: "settings",
+      },
+    ],
+  },
+  {
+    name: "Reports",
+    path: "/reports",
+    icon: FileText,
+    key: "reports",
+  },
+  {
+    name: "Calendar",
+    path: "/calendar",
+    icon: Calendar,
+    key: "calendar",
+  }, */
+]
+
 
   const toggleSubmenu = (key: string) => {
     if (openSubmenu === key) {
@@ -248,7 +286,7 @@ export default function Sidebar({ userRole = "admin" }: { userRole?: string }) {
       <div className="p-4 mt-auto">
         <div className="bg-backgroundsecondary rounded-lg p-3">
           <p className="text-sm font-medium text-gray-800">Logged in as:</p>
-          <p className="text-xs text-gray-600 capitalize">{userRole} User</p>
+          <p className="text-xs text-gray-600 capitalize">{userRole} {user?.username}</p>
         </div>
       </div>
     </aside>

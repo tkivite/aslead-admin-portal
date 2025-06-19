@@ -5,8 +5,8 @@ import type React from "react"
 import { useState, useRef } from "react"
 import { motion } from "framer-motion"
 import { Send, Upload, Users, Clock, CheckCircle, AlertCircle, ChevronDown, ChevronUp, X } from "lucide-react"
-import Papa from "papaparse"
-
+/* import Papa from "papaparse"
+ */
 // Mock data for sent messages
 const sentMessagesData = [
   {
@@ -101,7 +101,7 @@ export default function MessagingPage() {
       alert("Please upload a CSV file")
       return
     }
-
+/* 
     // Parse CSV file
     Papa.parse(file, {
       complete: (results) => {
@@ -125,7 +125,7 @@ export default function MessagingPage() {
       header: true,
       skipEmptyLines: true,
     })
-
+ */
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = ""

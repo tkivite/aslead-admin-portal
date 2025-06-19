@@ -17,8 +17,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
-import { programsService, admissionCyclesService } from "@/services/api"
-import { Program } from "@/types/api.types"
+import { admissionCyclesService } from "@/services/admission_cycles.api"
+import { programsService } from "@/services/courses.api"
+import type { Program } from "@/types/courses.types"
 
 interface AdmissionCycle {
   cycleId: number

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 
+import StoreProvider from "./StoreProvider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,11 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <StoreProvider >
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ClientLayout> {children}</ClientLayout>
        
       </body>
     </html>
+    </StoreProvider>
   );
 }
