@@ -49,6 +49,7 @@ export default function ClientLayout({
     const accessToken = localStorage.getItem("accessTokenSite");
 
     if (pathname === "/login") {
+      setLoading(false);
       return;
     }
 
@@ -57,7 +58,7 @@ export default function ClientLayout({
     }
   
     fetchApplications();
-  }, [user]);
+  }, []);
 
   return loading ? (
     <div className="flex items-center justify-center h-screen bg-backgroundsecondary">
