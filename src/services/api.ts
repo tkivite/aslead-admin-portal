@@ -22,14 +22,5 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor to handle token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    window.location.href = "/login";
-
-    return Promise.reject(error);
-  }
-);
 
 export default api;
