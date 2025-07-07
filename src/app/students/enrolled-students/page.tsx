@@ -6,6 +6,7 @@ import { Calendar, MapPin, User, Phone, Mail, GraduationCap } from "lucide-react
 import DataTable from "@/app/components/common/DataTable"
 import type { Student } from "@/types/students.types"
 import { exportStudentsToCSV } from "@/utils/csvExport"
+import DocumentsViewer from "@/app/components/common/DocumentsViewer"
 import { studentsService } from "@/services/students.api"
 
 export default function EnrolledStudentsPage() {
@@ -151,15 +152,21 @@ export default function EnrolledStudentsPage() {
             <span className="font-medium">Fee Status:</span>
             <span
               className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                student.application.feePaymentStatus === "PAID"
+                student?.application?.feePaymentStatus === "PAID"
                   ? "bg-tertiary/10 text-tertiary"
                   : "bg-red-100 text-red-600"
               }`}
             >
-              {student.application.feePaymentStatus.replace("_", " ")}
+              {student?.application?.feePaymentStatus?.replace("_", " ")}
             </span>
           </p>
         </div>
+         <div className="space-y-2">
+        <DocumentsViewer
+          applicantId={student?.applicant?.applicantId}
+          applicantName={`${student?.applicant?.firstName} ${student?.applicant?.lastName}`}
+        />
+      </div>
       </div>
     </div>
   )

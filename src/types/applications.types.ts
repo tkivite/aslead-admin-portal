@@ -36,6 +36,7 @@ export interface Application {
 }
 
 
+
 // Enrollment types
 export interface EnrollmentRequest {
   applicant: {
@@ -56,4 +57,9 @@ export interface Applicant {
   currentEducationLevel: string;
   createdAt: string;
   updatedAt: string;
+}
+export interface Document {
+  documentId: number
+  content: string // Base64 encoded content
+  documentType: string
 }
