@@ -1,6 +1,7 @@
 import api from "./api"
 import type { ApiResponse, PageResponse } from "@/types/api.types"
-import type { Application } from "@/types/applications.types"
+import type { Application,Document } from "@/types/applications.types"
+
 
 // Applications services
 export const applicationsService = {
@@ -62,5 +63,10 @@ export const applicationsService = {
     }
 
     await api.post("/aslead/application/api/students/new", payload)
+  },
+    // Get documents for an applicant
+  getApplicantDocuments: async (applicantId: number): Promise<Document[]> => {
+    const response = await api.get<Document[]>(`/application/api/documents/${applicantId}`)
+    return response.data || []
   },
 }

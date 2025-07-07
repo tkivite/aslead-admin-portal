@@ -176,19 +176,19 @@ export default function RecentApplicationsTable({ applications, loading = false 
                                 <span className="font-medium">Fee Status:</span>
                                 <span
                                   className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                                    application.feePaymentStatus === "PAID"
+                                    application?.feePaymentStatus === "PAID"
                                       ? "bg-tertiary/10 text-tertiary"
                                       : "bg-red-100 text-red-600"
                                   }`}
                                 >
-                                  {application.feePaymentStatus.replace("_", " ")}
+                                  {application?.feePaymentStatus?.replace("_", " ")}
                                 </span>
                               </p>
                               <p>
-                                <span className="font-medium">Reference:</span> {application.paymentReference || "N/A"}
+                                <span className="font-medium">Reference:</span> {application?.paymentReference || "N/A"}
                               </p>
                               <p>
-                                <span className="font-medium">Applied:</span> {formatDate(application.createdAt)}
+                                <span className="font-medium">Applied:</span> {formatDate(application?.createdAt)}
                               </p>
                             </div>
                           </div>

@@ -7,6 +7,7 @@ import DataTable from "@/app/components/common/DataTable"
 import type { Student } from "@/types/students.types"
 import { exportStudentsToCSV } from "@/utils/csvExport"
 import { studentsService } from "@/services/students.api"
+import DocumentsViewer from "@/app/components/common/DocumentsViewer"
 
 export default function ExitedStudentsPage() {
   const [students, setStudents] = useState<Student[]>([])
@@ -151,6 +152,12 @@ export default function ExitedStudentsPage() {
             <span className="font-medium">Duration:</span> {student.application.program.durationMonths} months
           </p>
         </div>
+      </div>
+       <div className="space-y-2">
+        <DocumentsViewer
+          applicantId={student.applicant.applicantId}
+          applicantName={`${student.applicant.firstName} ${student.applicant.lastName}`}
+        />
       </div>
     </div>
   )

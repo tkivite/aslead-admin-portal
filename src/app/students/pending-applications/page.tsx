@@ -7,6 +7,7 @@ import DataTable from "@/app/components/common/DataTable"
 import type { Application } from "@/types/applications.types"
 import { exportApplicationsToCSV } from "@/utils/csvExport"
 import { applicationsService } from "@/services/applications.api"
+import DocumentsViewer from "@/app/components/common/DocumentsViewer"
 
 export default function PendingApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([])
@@ -210,10 +211,10 @@ export default function PendingApplicationsPage() {
             <span className="font-medium">Fee Status:</span>
             <span
               className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                app.feePaymentStatus === "PAID" ? "bg-tertiary/10 text-tertiary" : "bg-red-100 text-red-600"
+                app?.feePaymentStatus === "PAID" ? "bg-tertiary/10 text-tertiary" : "bg-red-100 text-red-600"
               }`}
             >
-              {app.feePaymentStatus.replace("_", " ")}
+              {app?.feePaymentStatus.replace("_", " ")}
             </span>
           </p>
           <p>
@@ -224,6 +225,13 @@ export default function PendingApplicationsPage() {
             <span className="font-medium">Applied:</span> {formatDate(app.createdAt)}
           </p>
         </div>
+      </div>
+     
+      <div className="space-y-2">
+        <DocumentsViewer
+          applicantId={app?.applicant?.applicantId}
+          applicantName={`${app.applicant?.firstName} ${app?.applicant?.lastName}`}
+        />
       </div>
     </div>
   )
