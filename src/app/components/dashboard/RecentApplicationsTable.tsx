@@ -96,7 +96,7 @@ export default function RecentApplicationsTable({ applications, loading = false 
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">{application.campus.name}</td>
                   <td className="px-4 py-3 text-sm font-medium text-tertiary">
-                    KES {application.feeAmount.toLocaleString()}
+                    KES {application?.feeAmount?.toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
                     <span

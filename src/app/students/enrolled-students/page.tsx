@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Calendar, MapPin, User, Phone, Mail, GraduationCap } from "lucide-react"
 import DataTable from "@/app/components/common/DataTable"
+
 import type { Student } from "@/types/students.types"
 import { exportStudentsToCSV } from "@/utils/csvExport"
 import DocumentsViewer from "@/app/components/common/DocumentsViewer"
@@ -33,6 +34,7 @@ export default function EnrolledStudentsPage() {
       setLoading(false)
     }
   }
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -161,12 +163,12 @@ export default function EnrolledStudentsPage() {
             </span>
           </p>
         </div>
-         <div className="space-y-2">
-        <DocumentsViewer
-          applicantId={student?.applicant?.applicantId}
-          applicantName={`${student?.applicant?.firstName} ${student?.applicant?.lastName}`}
-        />
-      </div>
+        <div className="space-y-2">
+          <DocumentsViewer
+            applicantId={student?.applicant?.applicantId}
+            applicantName={`${student?.applicant?.firstName} ${student?.applicant?.lastName}`}
+          />
+        </div>
       </div>
     </div>
   )
@@ -176,10 +178,15 @@ export default function EnrolledStudentsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 relative">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <h1 className="text-3xl font-bold text-textDark mb-2">Enrolled Students</h1>
-        <p className="text-gray-600">Manage currently enrolled students</p>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-textDark mb-2">Enrolled Students</h1>
+            <p className="text-gray-600">Manage currently enrolled students</p>
+          </div>
+       
+        </div>
       </motion.div>
 
       <motion.div
@@ -202,6 +209,8 @@ export default function EnrolledStudentsPage() {
           title={`Enrolled Students (${totalElements})`}
         />
       </motion.div>
+
+
     </div>
   )
 }
