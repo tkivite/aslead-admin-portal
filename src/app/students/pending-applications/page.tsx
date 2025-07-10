@@ -1,78 +1,101 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Calendar, CreditCard, MapPin, User, Phone, Mail, GraduationCap, Check} from "lucide-react"
-import DataTable from "@/app/components/common/DataTable"
-import type { Application } from "@/types/applications.types"
-import { exportApplicationsToCSV } from "@/utils/csvExport"
-import { applicationsService } from "@/services/applications.api"
-import DocumentsViewer from "@/app/components/common/DocumentsViewer"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Calendar,
+  CreditCard,
+  MapPin,
+  User,
+  Phone,
+  Mail,
+  GraduationCap,
+  Check,
+  Plus,
+} from "lucide-react";
+import DataTable from "@/app/components/common/DataTable";
+import type { Application } from "@/types/applications.types";
+import AddStudentModal from "./components/add-student-modal";
+import { exportApplicationsToCSV } from "@/utils/csvExport";
+import { applicationsService } from "@/services/applications.api";
+import DocumentsViewer from "@/app/components/common/DocumentsViewer";
 
 export default function PendingApplicationsPage() {
-  const [applications, setApplications] = useState<Application[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [totalElements, setTotalElements] = useState(0)
-  const [approvingIds, setApprovingIds] = useState<Set<number>>(new Set())
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [approvingIds, setApprovingIds] = useState<Set<number>>(new Set());
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
-    fetchApplications()
-  }, [currentPage])
+    fetchApplications();
+  }, [currentPage]);
 
   const fetchApplications = async () => {
     try {
-      setLoading(true)
-      const response = await applicationsService.getPaginatedApplications(currentPage, 10, "PENDING")
-      setApplications(response.content)
-      setTotalPages(response.totalPages)
-      setTotalElements(response.totalElements)
+      setLoading(true);
+      const response = await applicationsService.getPaginatedApplications(
+        currentPage,
+        10,
+        "PENDING"
+      );
+      setApplications(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
     } catch (error) {
-      console.error("Error fetching pending applications:", error)
+      console.error("Error fetching pending applications:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleApproveApplication = async (application: Application) => {
     try {
-      setApprovingIds((prev) => new Set(prev).add(application.applicationId))
+      setApprovingIds((prev) => new Set(prev).add(application.applicationId));
 
-      await applicationsService.approveApplication(application.applicant.applicantId, application.applicationId)
+      await applicationsService.approveApplication(
+        application.applicant.applicantId,
+        application.applicationId
+      );
 
       // Remove the approved application from the current list
-      setApplications((prev) => prev.filter((app) => app.applicationId !== application.applicationId))
+      setApplications((prev) =>
+        prev.filter((app) => app.applicationId !== application.applicationId)
+      );
 
       // Update total elements count
-      setTotalElements((prev) => prev - 1)
+      setTotalElements((prev) => prev - 1);
 
       // If current page becomes empty and it's not the first page, go to previous page
       if (applications.length === 1 && currentPage > 0) {
-        setCurrentPage((prev) => prev - 1)
+        setCurrentPage((prev) => prev - 1);
       } else {
         // Refresh the current page to get updated data
-        fetchApplications()
+        fetchApplications();
       }
     } catch (error) {
-      console.error("Error approving application:", error)
-    
+      console.error("Error approving application:", error);
     } finally {
       setApprovingIds((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(application.applicationId)
-        return newSet
-      })
+        const newSet = new Set(prev);
+        newSet.delete(application.applicationId);
+        return newSet;
+      });
     }
-  }
+  };
+  const handleAddStudentSuccess = () => {
+    fetchApplications(); // Refresh the students list
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   const columns = [
     {
@@ -92,7 +115,9 @@ export default function PendingApplicationsPage() {
       label: "Program",
       render: (app: Application) => (
         <div>
-          <div className="text-sm font-medium text-textDark">{app.program.code}</div>
+          <div className="text-sm font-medium text-textDark">
+            {app.program.code}
+          </div>
           <div className="text-xs text-gray-500">{app.program.name}</div>
         </div>
       ),
@@ -100,13 +125,17 @@ export default function PendingApplicationsPage() {
     {
       key: "campus",
       label: "Campus",
-      render: (app: Application) => <span className="text-sm text-gray-600">{app.campus.name}</span>,
+      render: (app: Application) => (
+        <span className="text-sm text-gray-600">{app.campus.name}</span>
+      ),
     },
     {
       key: "feeAmount",
       label: "Fee Amount",
       render: (app: Application) => (
-        <span className="text-sm font-medium text-tertiary">KES {app.feeAmount.toLocaleString()}</span>
+        <span className="text-sm font-medium text-tertiary">
+          KES {app.feeAmount.toLocaleString()}
+        </span>
       ),
     },
     {
@@ -121,7 +150,11 @@ export default function PendingApplicationsPage() {
     {
       key: "submittedAt",
       label: "Submitted",
-      render: (app: Application) => <span className="text-sm text-gray-600">{formatDate(app.submittedAt)}</span>,
+      render: (app: Application) => (
+        <span className="text-sm text-gray-600">
+          {formatDate(app.submittedAt)}
+        </span>
+      ),
     },
     {
       key: "actions",
@@ -130,8 +163,8 @@ export default function PendingApplicationsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => {
-              e.stopPropagation()
-              handleApproveApplication(app)
+              e.stopPropagation();
+              handleApproveApplication(app);
             }}
             disabled={approvingIds.has(app.applicationId)}
             className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -148,11 +181,10 @@ export default function PendingApplicationsPage() {
               </>
             )}
           </button>
-       
         </div>
       ),
     },
-  ]
+  ];
 
   const expandableRow = (app: Application) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -171,13 +203,16 @@ export default function PendingApplicationsPage() {
             <span className="font-medium">Email:</span> {app.applicant.email}
           </p>
           <p>
-            <span className="font-medium">DOB:</span> {formatDate(app.applicant.dob)}
+            <span className="font-medium">DOB:</span>{" "}
+            {formatDate(app.applicant.dob)}
           </p>
           <p>
-            <span className="font-medium">Education:</span> {app.applicant.currentEducationLevel}
+            <span className="font-medium">Education:</span>{" "}
+            {app.applicant.currentEducationLevel}
           </p>
           <p>
-            <span className="font-medium">Citizenship:</span> {app.applicant.citizenship}
+            <span className="font-medium">Citizenship:</span>{" "}
+            {app.applicant.citizenship}
           </p>
         </div>
       </div>
@@ -189,10 +224,12 @@ export default function PendingApplicationsPage() {
         </h4>
         <div className="text-sm space-y-1">
           <p>
-            <span className="font-medium">Duration:</span> {app.program.durationMonths} months
+            <span className="font-medium">Duration:</span>{" "}
+            {app.program.durationMonths} months
           </p>
           <p>
-            <span className="font-medium">Tuition:</span> KES {app.program.tuitionFee.toLocaleString()}
+            <span className="font-medium">Tuition:</span> KES{" "}
+            {app.program.tuitionFee.toLocaleString()}
           </p>
           <p className="flex items-center gap-2">
             <MapPin className="h-3 w-3" />
@@ -211,22 +248,26 @@ export default function PendingApplicationsPage() {
             <span className="font-medium">Fee Status:</span>
             <span
               className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                app?.feePaymentStatus === "PAID" ? "bg-tertiary/10 text-tertiary" : "bg-red-100 text-red-600"
+                app?.feePaymentStatus === "PAID"
+                  ? "bg-tertiary/10 text-tertiary"
+                  : "bg-red-100 text-red-600"
               }`}
             >
               {app?.feePaymentStatus.replace("_", " ")}
             </span>
           </p>
           <p>
-            <span className="font-medium">Reference:</span> {app.paymentReference || "N/A"}
+            <span className="font-medium">Reference:</span>{" "}
+            {app.paymentReference || "N/A"}
           </p>
           <p className="flex items-center gap-2">
             <Calendar className="h-3 w-3" />
-            <span className="font-medium">Applied:</span> {formatDate(app.createdAt)}
+            <span className="font-medium">Applied:</span>{" "}
+            {formatDate(app.createdAt)}
           </p>
         </div>
       </div>
-     
+
       <div className="space-y-2">
         <DocumentsViewer
           applicantId={app?.applicant?.applicantId}
@@ -234,17 +275,36 @@ export default function PendingApplicationsPage() {
         />
       </div>
     </div>
-  )
+  );
 
   const handleExport = () => {
-    exportApplicationsToCSV(applications)
-  }
+    exportApplicationsToCSV(applications);
+  };
 
   return (
     <div className="p-6 space-y-6">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <h1 className="text-3xl font-bold text-textDark mb-2">Pending Applications</h1>
-        <p className="text-gray-600">Manage and review pending student applications</p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-textDark mb-2">
+              Pending Applications
+            </h1>
+            <p className="text-gray-600">
+              Manage and review pending student applications
+            </p>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add Student
+          </button>
+        </div>
       </motion.div>
 
       <motion.div
@@ -267,6 +327,11 @@ export default function PendingApplicationsPage() {
           title={`Pending Applications (${totalElements})`}
         />
       </motion.div>
+       <AddStudentModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSuccess={handleAddStudentSuccess}
+      />
     </div>
-  )
+  );
 }
