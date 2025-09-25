@@ -53,7 +53,7 @@ export default function EnrolledStudentsPage() {
           <div className="text-sm font-medium text-textDark">
             {student.applicant.firstName} {student.applicant.lastName}
           </div>
-          <div className="text-xs text-gray-500">{student.applicant.email}</div>
+          <div className="text-xs text-gray-500">{student.admissionNumber}</div>
         </div>
       ),
     },

@@ -48,42 +48,50 @@ export const studentsService = {
     const response = await api.get<ApiResponse<PageResponse<Student>>>(url);
     return response.data.body;
   },
-    // Get all programs
+  // Get all programs
   getPrograms: async (): Promise<Program[]> => {
-    const response = await api.get<ApiResponse<{ content: Program[] }>>("/application/api/programs?action=fetch")
-    return response.data.body.content
+    const response = await api.get<ApiResponse<{ content: Program[] }>>(
+      "/application/api/programs?action=fetch"
+    );
+    return response.data.body.content;
   },
 
   // Get all campuses
   getCampuses: async (): Promise<Campus[]> => {
-    const response = await api.get<ApiResponse<{ content: Campus[] }>>("/application/api/allCampuses")
-    return response.data.body.content
+    const response = await api.get<ApiResponse<{ content: Campus[] }>>(
+      "/application/api/allCampuses"
+    );
+    return response.data.body.content;
   },
 
   // Add new student (create application)
   addStudent: async (studentData: {
-    programId: number
-    campusId: number
-    additionalInfo: string
-    paymentReference: string
+    programId: number;
+    campusId: number;
+    additionalInfo: string;
+    paymentReference: string;
     applicantInfo: {
-      firstName: string
-      lastName: string
-      email: string | null
-      mobile: string
-      dob: string
-      citizenship: string
-      currentEducationLevel: string
-      documentType: string
-      documentNumber: string
-    }
+      firstName: string;
+      lastName: string;
+      email: string | null;
+      mobile: string;
+      dob: string;
+      gender: string;
+      citizenship: string;
+      currentEducationLevel: string;
+      documentType: string;
+      documentNumber: string;
+    };
     documents: Array<{
-      documentType: string
-      content: string
-      status: "PENDING"
-    }>
+      documentType: string;
+      content: string;
+      status: "PENDING";
+    }>;
   }) => {
-    const response = await api.post<ApiResponse<Student>>("/application/api/applications/new", studentData)
-    return response.data
+    const response = await api.post<ApiResponse<Student>>(
+      "/application/api/applications/new",
+      studentData
+    );
+    return response.data;
   },
 };

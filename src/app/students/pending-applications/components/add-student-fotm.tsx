@@ -79,10 +79,10 @@ export default function AddStudentForm({
       return
     }
 
-    if (!formData.documents.nationalId || !formData.documents.passportPhoto) {
-      toast.error("Please upload National ID and Passport Photo.")
-      return
-    }
+    // if (!formData.documents.nationalId || !formData.documents.passportPhoto) {
+    //   toast.error("Please upload National ID and Passport Photo.")
+    //   return
+    // }
 
     onSubmit(formData)
   }
@@ -328,12 +328,12 @@ export default function AddStudentForm({
         {/* Documents Upload */}
         <div className="col-span-1 md:col-span-2 space-y-2">
           <label className="block text-sm font-medium text-gray-700">
-            Documents <span className="text-red-500">*</span>
+            Documents <span className="text-gray-400">(Optional)</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
               <label htmlFor="nationalId" className="block text-sm text-gray-600">
-                National ID <span className="text-red-500">*</span>
+                National ID <span className="text-gray-400">(Optional)</span>
               </label>
               <input
                 id="nationalId"
@@ -348,7 +348,7 @@ export default function AddStudentForm({
 
             <div className="space-y-1">
               <label htmlFor="passportPhoto" className="block text-sm text-gray-600">
-                Passport Photo <span className="text-red-500">*</span>
+                Passport Photo <span className="text-gray-400">(Optional)</span>
               </label>
               <input
                 id="passportPhoto"

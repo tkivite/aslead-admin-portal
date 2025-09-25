@@ -1,51 +1,53 @@
-import { Application } from "./applications.types"
+import { Application } from "./applications.types";
 
 export interface Student {
-  studentId: number
+  studentId: number;
   applicant: {
-    applicantId: number
-    firstName: string
-    lastName: string
-    email: string
-    mobile: string
-    dob: string
-    citizenship: string
-    currentEducationLevel: string
-    createdAt: string
-    updatedAt: string
-  }
-  application: Application
-  enrollmentStatus: string
-  enrolledAt: string
-  createdAt: string
-  updatedAt: string
+    applicantId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    mobile: string;
+    dob: string;
+    gender: string;
+    citizenship: string;
+    currentEducationLevel: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  application: Application;
+  enrollmentStatus: string;
+  enrolledAt: string;
+  createdAt: string;
+  updatedAt: string;
+  admissionNumber: string;
 }
 export interface Program {
-  programId: number
-  code: string
-  name: string
-  description: string
-  durationMonths: number
-  tuitionFee: number
-  applicationFee: number
-  status: string
-  createdAt: string
-  updatedAt: string
+  programId: number;
+  code: string;
+  name: string;
+  description: string;
+  durationMonths: number;
+  tuitionFee: number;
+  applicationFee: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
   costs?: Array<{
-    id: number
-    description: string
-    amount: number
-  }>
+    id: number;
+    description: string;
+    amount: number;
+  }>;
 }
 
 export interface Campus {
-  id: number
-  name: string
-  location: string
-  address?: string
-  phone?: string
-  email?: string
-  status: string
-  createdAt: string
-  updatedAt: string
+  id: number;
+  name: string;
+  location: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }

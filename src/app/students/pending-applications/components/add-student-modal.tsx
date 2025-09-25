@@ -113,6 +113,7 @@ export default function AddStudentModal({
           email: studentData.email || null,
           mobile: studentData.mobileNumber,
           dob: studentData.dateOfBirth,
+          gender: studentData.gender,
           citizenship: studentData.citizenship,
           currentEducationLevel: studentData.currentEducationLevel,
           documentType: studentData.identityType,

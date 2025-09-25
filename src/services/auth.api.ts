@@ -3,7 +3,7 @@ import { AuthResponse } from "@/types/api.types";
 export const authService = {
   login: async (username: string, password: string): Promise<AuthResponse> => {
     const response = await fetch(
-      "https://gateway.itiksolutions.com/aslead/auth/api/v1/login",
+      "https://gateway.itiksolutions.com/aslead/sandbox/auth/api/v1/login",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -19,4 +19,3 @@ export const authService = {
     return data as AuthResponse;
   },
 };
-

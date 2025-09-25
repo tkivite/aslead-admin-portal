@@ -251,6 +251,7 @@ const menuItems: MenuItem[] = [
                     <ul className="mt-1 ml-6 space-y-1">
                       {getFilteredSubmenu(item.submenu).map((subItem) => (
                         <li key={subItem.name}>
+                           {/* @ts-ignore */}
                           <Link
                             href={subItem.path}
                             className={`flex items-center p-2 rounded-lg ${
