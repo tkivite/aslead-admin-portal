@@ -3,7 +3,7 @@ import { AuthResponse } from "@/types/api.types";
 export const authService = {
   login: async (username: string, password: string): Promise<AuthResponse> => {
     const response = await fetch(
-      "https://gateway.itiksolutions.com/aslead/sandbox/auth/api/v1/login",
+      `${process.env.NEXT_PUBLIC_BASE_URL}/auth/api/v1/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
