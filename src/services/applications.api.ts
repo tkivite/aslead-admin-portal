@@ -19,7 +19,7 @@ export const applicationsService = {
       JSON.stringify({ status: "PENDING" })
     );
     const response = await api.get<ApiResponse<PageResponse<Application>>>(
-      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=search`
+      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=fetch`
     );
     return response.data.body;
   },
@@ -30,7 +30,7 @@ export const applicationsService = {
       JSON.stringify({ status: "APPROVED" })
     );
     const response = await api.get<ApiResponse<PageResponse<Application>>>(
-      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=search`
+      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=fetch`
     );
     return response.data.body;
   },
@@ -48,7 +48,7 @@ export const applicationsService = {
     size = 10,
     status?: string
   ): Promise<PageResponse<Application>> => {
-    let url = `/application/api/applications?sortby=createdAt&sortdirection=DESC&size=${size}&page=${page}&action=search`;
+    let url = `/application/api/applications?sortby=createdAt&sortdirection=DESC&size=${size}&page=${page}&action=fetch`;
     if (status) {
       const searchParams = encodeURIComponent(JSON.stringify({ status }));
       url += `&search=${searchParams}`;

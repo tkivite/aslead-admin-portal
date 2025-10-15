@@ -3,11 +3,10 @@
 import type React from "react";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import { authService } from "@/services/auth.api";
+import { useAuth } from "@/lib/contexts/AuthContext";
 import { useAppDispatch } from "@/lib/hooks";
 import { addUser } from "@/lib/features/userSlice";
 
@@ -16,38 +15,25 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const { login, isLoading } = useAuth();
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
     // Validate form
     if (!username || !password) {
       setError("Please enter both username and password");
-      setIsLoading(false);
       return;
     }
 
     try {
-      const response = await authService.login(username, password);
-
-      // Store tokens in localStorage
-      localStorage.setItem("accessTokenSite", response.access_token);
-      localStorage.setItem("refreshTokenSite", response.refresh_token);
+      await login(username, password);
       dispatch(addUser({ username, password }));
-
-      // Redirect to dashboard
-      router.push("/");
     } catch (err) {
-      console.error("Login error:");
-      console.error(err);
+      console.error("Login error:", err);
       setError("Invalid username or password");
-    } finally {
-      setIsLoading(false);
     }
   };
 

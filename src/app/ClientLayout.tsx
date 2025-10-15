@@ -2,78 +2,75 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 import "./globals.css";
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
+import MobileNavbar from "./components/layout/MobileNavbar";
+import MobileSidebar from "./components/layout/MobileSidebar";
+import AuthGuard from "./components/common/AuthGuard";
 import { useAppSelector } from "@/lib/hooks";
-import { applicationsService } from "@/services/applications.api";
 
 export default function ClientLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   const pathname = usePathname();
   const user = useAppSelector((state) => state.user.value);
-  const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const fetchApplications = async () => {
-    try {
-
-      await applicationsService.getPaginatedApplications(0, 10, "PENDING");
-    } catch (error) {
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "status" in error &&
-        typeof (error as { status: number }).status === "number"
-      ) {
-        const typedError = error as { status: number };
-        if (typedError.status === 401) {
-          router.push("/login");
-        }
-      }
-
-      console.error("Error fetching pending applications:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Close mobile menu when route changes
   useEffect(() => {
-    // Check if we're on the login page
-    const accessToken = localStorage.getItem("accessTokenSite");
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
-    if (pathname === "/login") {
-      setLoading(false);
-      return;
-    }
+  // If on login page, render without auth guard
+  if (pathname === "/login") {
+    return <>{children}</>;
+  }
 
-    if (!accessToken) {
-      router.push("/login");
-    }
-  
-    fetchApplications();
-  }, []);
+  // For all other pages, wrap with AuthGuard
+  return (
+    <AuthGuard>
+      <div className="flex h-screen bg-backgroundsecondary">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block">
+          <Sidebar 
+            userRole={user?.role || "admin"} 
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          />
+        </div>
 
-  return loading ? (
-    <div className="flex items-center justify-center h-screen bg-backgroundsecondary">
-      <div className="loader"></div>
-    </div>
-  ) : (
+        <div className="flex flex-col flex-1 overflow-hidden">
+          {/* Desktop Header */}
+          <div className="hidden md:block">
+            <Header 
+              isSidebarCollapsed={isSidebarCollapsed}
+              onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            />
+          </div>
 
-    <div className="flex h-screen bg-backgroundsecondary">
-      {pathname !== "/login" && <Sidebar userRole={user?.role || "admin"} />}
+          {/* Mobile Navbar */}
+          <div className="md:hidden">
+            <MobileNavbar onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
+          </div>
 
-      <div className="flex flex-col flex-1 overflow-hidden">
-        {pathname !== "/login" && <Header />}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+          {/* Main Content */}
+          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        </div>
+
+        {/* Mobile Sidebar */}
+        <MobileSidebar
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+          userRole={user?.role || "admin"}
+        />
       </div>
-    </div>
-  
-)
+    </AuthGuard>
+  );
 }
