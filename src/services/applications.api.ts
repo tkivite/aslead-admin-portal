@@ -62,7 +62,9 @@ export const applicationsService = {
   // Approve application
   approveApplication: async (
     applicantId: number,
-    applicationId: number
+    applicationId: number,
+    startYear: number,
+    startMonth: string
   ): Promise<void> => {
     const payload = {
       applicant: {
@@ -73,6 +75,8 @@ export const applicationsService = {
       },
       enrollmentStatus: "ENROLLED",
       enrolledAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+      startYear: startYear,
+      startMonth: startMonth,
     };
 
     await api.post("/application/api/students/new", payload);
