@@ -25,7 +25,7 @@ export const studentsService = {
       JSON.stringify({ enrollmentStatus: "COMPLETED" })
     );
     const response = await api.get<ApiResponse<PageResponse<Student>>>(
-      `/application/api/students?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=search`
+      `/application/api/students?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=fetch`
     );
     return response.data.body;
   },
