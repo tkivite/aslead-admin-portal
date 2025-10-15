@@ -19,7 +19,7 @@ export const applicationsService = {
       JSON.stringify({ status: "PENDING" })
     );
     const response = await api.get<ApiResponse<PageResponse<Application>>>(
-      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=search`
+      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=fetch`
     );
     return response.data.body;
   },
@@ -30,7 +30,7 @@ export const applicationsService = {
       JSON.stringify({ status: "APPROVED" })
     );
     const response = await api.get<ApiResponse<PageResponse<Application>>>(
-      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=search`
+      `/application/api/applications?search=${searchParams}&sortby=createdAt&sortdirection=DESC&size=10&page=0&action=fetch`
     );
     return response.data.body;
   },
@@ -48,7 +48,7 @@ export const applicationsService = {
     size = 10,
     status?: string
   ): Promise<PageResponse<Application>> => {
-    let url = `/application/api/applications?sortby=createdAt&sortdirection=DESC&size=${size}&page=${page}&action=search`;
+    let url = `/application/api/applications?sortby=createdAt&sortdirection=DESC&size=${size}&page=${page}&action=fetch`;
     if (status) {
       const searchParams = encodeURIComponent(JSON.stringify({ status }));
       url += `&search=${searchParams}`;
@@ -62,7 +62,9 @@ export const applicationsService = {
   // Approve application
   approveApplication: async (
     applicantId: number,
-    applicationId: number
+    applicationId: number,
+    startYear: number,
+    startMonth: string
   ): Promise<void> => {
     const payload = {
       applicant: {
@@ -73,6 +75,8 @@ export const applicationsService = {
       },
       enrollmentStatus: "ENROLLED",
       enrolledAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+      startYear: startYear,
+      startMonth: startMonth,
     };
 
     await api.post("/application/api/students/new", payload);

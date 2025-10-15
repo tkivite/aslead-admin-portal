@@ -2,10 +2,11 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
+import { motion } from "framer-motion"
 import {
 /*   BookOpen,
   Calendar, */
@@ -55,11 +56,28 @@ type MenuItem = {
   submenu?: MenuItem[]
 }
 
-export default function Sidebar({ userRole = "admin" }: { userRole?: string }) {
+interface SidebarProps {
+  userRole?: string;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
 
+export default function Sidebar({ userRole = "admin", isCollapsed = false, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
+  const [hasBeenExpandedByHover, setHasBeenExpandedByHover] = useState(false)
   const user = useAppSelector((state) => state.user.value)
+
+  // Show expanded state when not collapsed, or when hovered, or when previously expanded by hover
+  const isExpanded = !isCollapsed || isHovered || hasBeenExpandedByHover
+
+  // Reset hover expansion when sidebar is manually collapsed
+  useEffect(() => {
+    if (!isCollapsed) {
+      setHasBeenExpandedByHover(false)
+    }
+  }, [isCollapsed])
 
   // Get permissions for the current user role
   const permissions = rolePermissions[userRole as keyof typeof rolePermissions] || []
@@ -211,47 +229,99 @@ const menuItems: MenuItem[] = [
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen overflow-y-auto flex-shrink-0">
-      <div className="p-4 border-b border-gray-200 flex items-center">
-        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mr-3">
-          <Image src="/favicon.png" alt="ASLEAD Logo" width={24} height={24} className="object-contain" />
+    <motion.aside 
+      className={`bg-white border-r border-gray-200 h-screen overflow-y-auto flex-shrink-0 transition-all duration-300 ${
+        isExpanded ? 'w-64' : 'w-16'
+      }`}
+      onMouseEnter={() => {
+        setIsHovered(true)
+        if (isCollapsed) {
+          setHasBeenExpandedByHover(true)
+        }
+      }}
+      onMouseLeave={() => setIsHovered(false)}
+      animate={{ width: isExpanded ? 256 : 64 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+    >
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+            <Image src="/favicon.png" alt="ASLEAD Logo" width={24} height={24} className="object-contain" />
+          </div>
+          <motion.div
+            animate={{ opacity: isExpanded ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <h1 className="font-bold text-lg text-gray-800 whitespace-nowrap">ASLEAD</h1>
+            <p className="text-xs text-gray-500 whitespace-nowrap">Admin Portal</p>
+          </motion.div>
         </div>
-        <div>
-          <h1 className="font-bold text-lg text-gray-800">ASLEAD</h1>
-          <p className="text-xs text-gray-500">Admin Portal</p>
-        </div>
+        
+        {/* Collapse Button - Only show when expanded */}
+        {isExpanded && onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="hidden md:inline-flex items-center justify-center p-2 rounded-md bg-white/5 text-gray-600 hover:bg-white/10"
+            aria-label="Collapse sidebar"
+          >
+            «
+          </button>
+        )}
       </div>
 
       <nav className="p-4">
-        <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Main Menu</p>
+        <motion.p 
+          className="text-xs font-semibold text-gray-500 mb-2 uppercase"
+          animate={{ opacity: isExpanded ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          Main Menu
+        </motion.p>
         <ul className="space-y-1">
           {filteredMenuItems.map((item) => (
             <li key={item.name}>
               {item.submenu ? (
                 <div>
                   <button
-                    onClick={() => toggleSubmenu(item.key)}
+                    onClick={() => isExpanded && toggleSubmenu(item.key)}
                     className={`flex items-center justify-between w-full p-2 rounded-lg text-left ${
                       openSubmenu === item.key
                         ? "bg-backgroundsecondary text-primary"
                         : "text-gray-700 hover:bg-backgroundsecondary"
                     }`}
+                    title={!isExpanded ? item.name : undefined}
                   >
                     <div className="flex items-center">
-                      <item.icon className="w-5 h-5 mr-3" />
-                      <span>{item.name}</span>
+                      <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+                      <motion.span
+                        animate={{ opacity: isExpanded ? 1 : 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="whitespace-nowrap overflow-hidden"
+                      >
+                        {item.name}
+                      </motion.span>
                     </div>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        openSubmenu === item.key ? "transform rotate-180" : ""
-                      }`}
-                    />
+                    <motion.div
+                      animate={{ opacity: isExpanded ? 1 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          openSubmenu === item.key ? "transform rotate-180" : ""
+                        }`}
+                      />
+                    </motion.div>
                   </button>
-                  {openSubmenu === item.key && (
-                    <ul className="mt-1 ml-6 space-y-1">
+                  {openSubmenu === item.key && isExpanded && (
+                    <motion.ul
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-1 ml-6 space-y-1"
+                    >
                       {getFilteredSubmenu(item.submenu).map((subItem) => (
                         <li key={subItem.name}>
-                           {/* @ts-ignore */}
                           <Link
                             href={subItem.path}
                             className={`flex items-center p-2 rounded-lg ${
@@ -260,12 +330,12 @@ const menuItems: MenuItem[] = [
                                 : "text-gray-700 hover:bg-backgroundsecondary"
                             }`}
                           >
-                            <subItem.icon className="w-4 h-4 mr-3" />
-                            <span>{subItem.name}</span>
+                            <subItem.icon className="w-4 h-4 mr-3 flex-shrink-0" />
+                            <span className="whitespace-nowrap">{subItem.name}</span>
                           </Link>
                         </li>
                       ))}
-                    </ul>
+                    </motion.ul>
                   )}
                 </div>
               ) : (
@@ -274,9 +344,16 @@ const menuItems: MenuItem[] = [
                   className={`flex items-center p-2 rounded-lg ${
                     pathname === item.path ? "bg-primary text-white" : "text-gray-700 hover:bg-backgroundsecondary"
                   }`}
+                  title={!isExpanded ? item.name : undefined}
                 >
-                  <item.icon className="w-5 h-5 mr-3" />
-                  <span>{item.name}</span>
+                  <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+                  <motion.span
+                    animate={{ opacity: isExpanded ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="whitespace-nowrap overflow-hidden"
+                  >
+                    {item.name}
+                  </motion.span>
                 </Link>
               )}
             </li>
@@ -285,11 +362,15 @@ const menuItems: MenuItem[] = [
       </nav>
 
       <div className="p-4 mt-auto">
-        <div className="bg-backgroundsecondary rounded-lg p-3">
-          <p className="text-sm font-medium text-gray-800">Logged in as:</p>
-          <p className="text-xs text-gray-600 capitalize">{userRole} {user?.username}</p>
-        </div>
+        <motion.div 
+          className="bg-backgroundsecondary rounded-lg p-3"
+          animate={{ opacity: isExpanded ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <p className="text-sm font-medium text-gray-800 whitespace-nowrap">Logged in as:</p>
+          <p className="text-xs text-gray-600 capitalize whitespace-nowrap">{userRole} {user?.username}</p>
+        </motion.div>
       </div>
-    </aside>
+    </motion.aside>
   )
 }

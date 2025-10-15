@@ -40,8 +40,13 @@ export interface EnrollmentRequest {
   applicant: {
     applicantId: number;
   };
+  application: {
+    applicationId: number;
+  };
   enrollmentStatus: string;
   enrolledAt: string;
+  startYear: number;
+  startMonth: string;
 }
 
 export interface Applicant {

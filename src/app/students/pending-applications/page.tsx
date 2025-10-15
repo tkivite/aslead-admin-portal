@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Calendar,
@@ -16,6 +16,7 @@ import {
 import DataTable from "@/app/components/common/DataTable";
 import type { Application } from "@/types/applications.types";
 import AddStudentModal from "./components/add-student-modal";
+import ApprovalModal from "./components/approval-modal";
 import { exportApplicationsToCSV } from "@/utils/csvExport";
 import { applicationsService } from "@/services/applications.api";
 import DocumentsViewer from "@/app/components/common/DocumentsViewer";
@@ -28,12 +29,10 @@ export default function PendingApplicationsPage() {
   const [totalElements, setTotalElements] = useState(0);
   const [approvingIds, setApprovingIds] = useState<Set<number>>(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
 
-  useEffect(() => {
-    fetchApplications();
-  }, [currentPage]);
-
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       setLoading(true);
       const response = await applicationsService.getPaginatedApplications(
@@ -49,20 +48,33 @@ export default function PendingApplicationsPage() {
     } finally {
       setLoading(false);
     }
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const handleApproveClick = (application: Application) => {
+    setSelectedApplication(application);
+    setShowApprovalModal(true);
   };
 
-  const handleApproveApplication = async (application: Application) => {
+  const handleApproveApplication = async (startYear: number, startMonth: string) => {
+    if (!selectedApplication) return;
+
     try {
-      setApprovingIds((prev) => new Set(prev).add(application.applicationId));
+      setApprovingIds((prev) => new Set(prev).add(selectedApplication.applicationId));
 
       await applicationsService.approveApplication(
-        application.applicant.applicantId,
-        application.applicationId
+        selectedApplication.applicant.applicantId,
+        selectedApplication.applicationId,
+        startYear,
+        startMonth
       );
 
       // Remove the approved application from the current list
       setApplications((prev) =>
-        prev.filter((app) => app.applicationId !== application.applicationId)
+        prev.filter((app) => app.applicationId !== selectedApplication.applicationId)
       );
 
       // Update total elements count
@@ -75,12 +87,16 @@ export default function PendingApplicationsPage() {
         // Refresh the current page to get updated data
         fetchApplications();
       }
+
+      // Close the modal
+      setShowApprovalModal(false);
+      setSelectedApplication(null);
     } catch (error) {
       console.error("Error approving application:", error);
     } finally {
       setApprovingIds((prev) => {
         const newSet = new Set(prev);
-        newSet.delete(application.applicationId);
+        newSet.delete(selectedApplication.applicationId);
         return newSet;
       });
     }
@@ -164,10 +180,10 @@ export default function PendingApplicationsPage() {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleApproveApplication(app);
+              handleApproveClick(app);
             }}
             disabled={approvingIds.has(app.applicationId)}
-            className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-tertiary rounded-md hover:bg-tertiary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {approvingIds.has(app.applicationId) ? (
               <>
@@ -331,6 +347,17 @@ export default function PendingApplicationsPage() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSuccess={handleAddStudentSuccess}
+      />
+      
+      <ApprovalModal
+        isOpen={showApprovalModal}
+        onClose={() => {
+          setShowApprovalModal(false);
+          setSelectedApplication(null);
+        }}
+        onConfirm={handleApproveApplication}
+        application={selectedApplication}
+        isSubmitting={selectedApplication ? approvingIds.has(selectedApplication.applicationId) : false}
       />
     </div>
   );

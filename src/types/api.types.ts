@@ -15,7 +15,7 @@ export interface AuthResponse {
   scope: string;
 }
 
-// Pagination types
+
 export interface PageableInfo {
   sort: {
     empty: boolean;

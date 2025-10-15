@@ -18,7 +18,12 @@ const initialNotifications = [
   { id: "3", title: "System update completed", time: "Yesterday" },
 ]
 
-export default function Header() {
+interface HeaderProps {
+  isSidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
+}
+
+export default function Header({ isSidebarCollapsed = false, onToggleSidebar }: HeaderProps) {
   const [showProfile, setShowProfile] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
 
@@ -88,8 +93,17 @@ export default function Header() {
   }, [])
 
   return (
-    <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-end">
-     
+    <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
+      {/* Sidebar Toggle Button - Only show when collapsed */}
+      {isSidebarCollapsed && (
+        <button
+          onClick={onToggleSidebar}
+          className="hidden md:inline-flex items-center justify-center p-2 rounded-md bg-white/5 text-gray-600 hover:bg-white/10"
+          aria-label="Expand sidebar"
+        >
+          »
+        </button>
+      )}
 
       <div className="flex items-center space-x-4">
         <div className="relative" ref={notificationRef}>

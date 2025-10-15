@@ -119,7 +119,7 @@ export default function DataTable<T extends { [key: string]: any }>({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {data.map((item, index) => {
+              {data?.map((item, index) => {
                 const rowId = getRowId(item)
                 return (
                   <React.Fragment key={rowId}>
