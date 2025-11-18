@@ -3,6 +3,7 @@ export interface Application {
   applicant: {
     applicantId: number;
     firstName: string;
+    middleName: string;
     lastName: string;
     email: string;
     mobile: string;

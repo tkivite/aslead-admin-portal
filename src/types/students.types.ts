@@ -5,6 +5,7 @@ export interface Student {
   applicant: {
     applicantId: number;
     firstName: string;
+    middleName: string;
     lastName: string;
     email: string;
     mobile: string;
