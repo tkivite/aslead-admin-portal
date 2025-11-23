@@ -12,7 +12,9 @@ import {
   Users,
   UserCog,
   Smartphone,
-  X
+  X,
+  BookOpen,
+  MapPin
 } from "lucide-react";
 import { useAppSelector } from "@/lib/hooks";
 
@@ -35,6 +37,8 @@ const rolePermissions = {
     "all-payments",
     "mpesa-payments",
     "student-statements",
+    "programs",
+    "campuses",
   ],
   finance: ["dashboard", "students", "payments", "finance"],
   instructor: ["dashboard", "students", "courses", "messaging"],
@@ -95,6 +99,18 @@ export default function MobileSidebar({ isOpen, onClose, userRole = "admin" }: M
           key: "exited-students",
         },
       ],
+    },
+    {
+      name: "Programs",
+      path: "/programs",
+      icon: BookOpen,
+      key: "programs",
+    },
+    {
+      name: "Campuses",
+      path: "/campuses",
+      icon: MapPin,
+      key: "campuses",
     },
     {
       name: "Finance",

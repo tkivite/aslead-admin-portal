@@ -4,7 +4,8 @@ import type React from "react"
 import { toast } from "react-toastify"
 import { Loader2 } from "lucide-react"
 import type { StudentFormData } from "./add-student-modal"
-import type { Program, Campus } from "@/types/students.types"
+import type {  Campus } from "@/types/students.types"
+import type { Program } from "@/types/programs.types"
 
 interface AddStudentFormProps {
   formData: StudentFormData
