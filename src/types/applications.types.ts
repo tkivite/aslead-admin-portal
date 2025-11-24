@@ -13,6 +13,8 @@ export interface Application {
     currentEducationLevel: string;
     createdAt: string;
     updatedAt: string;
+    documentType: string;
+    documentNumber: number
   };
   program: {
     programId: number;
@@ -64,7 +66,17 @@ export interface Applicant {
   updatedAt: string;
 }
 export interface Document {
-  documentId: number;
+
+    documentId: number;
   content: string; // Base64 encoded content
   documentType: string;
+  }
+  
+
+
+export interface DocumentResponse {
+  headers: Record<string, any>;
+  body: Document[];
+  statusCode: string;
+  statusCodeValue: number;
 }

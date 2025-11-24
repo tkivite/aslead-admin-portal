@@ -103,9 +103,9 @@ export default function ApprovalModal({
               </div>
               <div className="text-sm space-y-1">
                 <p className="font-medium text-textDark">
-                  {application.applicant.firstName} {application.applicant.lastName}
+                  {application?.applicant?.firstName} {application?.applicant?.lastName}
                 </p>
-                <p className="text-gray-600">{application.applicant.email}</p>
+                <p className="text-gray-600">{application?.applicant?.email}</p>
                 <p className="text-gray-600">
                   {application.program.name} - {application.campus.name}
                 </p>

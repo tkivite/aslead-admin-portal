@@ -1,13 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
-import { Calendar, MapPin, User, Phone, Mail, GraduationCap } from "lucide-react"
+import { Calendar, MapPin, User, Phone, Mail, GraduationCap, Edit } from "lucide-react"
 import DataTable from "@/app/components/common/DataTable"
-import type { Student } from "@/types/students.types"
+import TableFilters, { FilterOptions } from "@/app/components/common/TableFilters"
+import type { Student,  Campus } from "@/types/students.types"
+import type { Program } from "@/types/programs.types"
 import { exportStudentsToCSV } from "@/utils/csvExport"
 import { studentsService } from "@/services/students.api"
 import DocumentsViewer from "@/app/components/common/DocumentsViewer"
+import EditStudentModal from "../components/edit-student-modal"
 
 export default function ExitedStudentsPage() {
   const [students, setStudents] = useState<Student[]>([])
@@ -15,15 +18,16 @@ export default function ExitedStudentsPage() {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
+  const [filters, setFilters] = useState<FilterOptions>({})
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [programs, setPrograms] = useState<Program[]>([])
+  const [campuses, setCampuses] = useState<Campus[]>([])
 
-  useEffect(() => {
-    fetchStudents()
-  }, [currentPage])
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await studentsService.getPaginatedStudents(currentPage, 10, "COMPLETED")
+      const response = await studentsService.getPaginatedStudents(currentPage, 10, "COMPLETED", filters)
       setStudents(response.content)
       setTotalPages(response.totalPages)
       setTotalElements(response.totalElements)
@@ -32,7 +36,26 @@ export default function ExitedStudentsPage() {
     } finally {
       setLoading(false)
     }
+  }, [currentPage, filters])
+
+  useEffect(() => {
+    fetchStudents()
+    fetchProgramsAndCampuses()
+  }, [fetchStudents])
+
+  const fetchProgramsAndCampuses = async () => {
+    try {
+      const [programsData, campusesData] = await Promise.all([
+        studentsService.getPrograms(),
+        studentsService.getCampuses(),
+      ])
+      setPrograms(programsData)
+      setCampuses(campusesData)
+    } catch (error) {
+      console.error("Error fetching programs and campuses:", error)
+    }
   }
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -83,6 +106,19 @@ export default function ExitedStudentsPage() {
       key: "enrolledAt",
       label: "Completed",
       render: (student: Student) => <span className="text-sm text-gray-600">{formatDate(student.enrolledAt)}</span>,
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (student: Student) => (
+        <button
+          onClick={() => handleEditClick(student)}
+          className="flex items-center gap-1 px-2 py-1 text-sm text-primary hover:text-primary/80 hover:bg-primary/10 rounded transition-colors"
+        >
+          <Edit className="w-4 h-4" />
+          Edit
+        </button>
+      ),
     },
   ]
 
@@ -166,6 +202,17 @@ export default function ExitedStudentsPage() {
     exportStudentsToCSV(students)
   }
 
+  const handleEditClick = (student: Student) => {
+    setSelectedStudent(student)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEditSuccess = () => {
+    fetchStudents()
+    setIsEditModalOpen(false)
+    setSelectedStudent(null)
+  }
+
   return (
     <div className="p-6 space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -178,6 +225,35 @@ export default function ExitedStudentsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
+        <TableFilters
+          onFiltersChange={setFilters}
+          showEnrollmentStatusFilter={false}
+          showDateRangeFilter={true}
+          showSearchFilter={true}
+          showSortFilter={true}
+          showCampusFilter={true}
+          showProgramFilter={true}
+          enrollmentStatusOptions={[
+            { value: "ENROLLED", label: "Enrolled" },
+            { value: "COMPLETED", label: "Completed" },
+            { value: "DROPPED", label: "Dropped" },
+          ]}
+          campusOptions={campuses.map(campus => ({
+            value: campus.id,
+            label: `${campus.name} - ${campus.location}`
+          }))}
+          programOptions={programs.map(program => ({
+            value: program.programId,
+            label: `${program.name} - ${program.code}`
+          }))}
+          sortOptions={[
+            { value: "createdAt", label: "Created Date" },
+            { value: "enrolledAt", label: "Enrolled Date" },
+            { value: "updatedAt", label: "Completed Date" },
+            { value: "applicant.firstName", label: "First Name" },
+            { value: "applicant.lastName", label: "Last Name" },
+          ]}
+        />
         <DataTable
           data={students}
           columns={columns}
@@ -193,6 +269,17 @@ export default function ExitedStudentsPage() {
           title={`Exited Students (${totalElements})`}
         />
       </motion.div>
+
+      {/* Edit Student Modal */}
+      <EditStudentModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setSelectedStudent(null)
+        }}
+        onSuccess={handleEditSuccess}
+        student={selectedStudent}
+      />
     </div>
   )
 }
