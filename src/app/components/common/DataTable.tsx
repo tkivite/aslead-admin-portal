@@ -26,6 +26,7 @@ interface DataTableProps<T> {
   searchable?: boolean
   onSearch?: (query: string) => void
   title?: string
+  onRowClick?: (item: T) => void
 }
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,6 +40,7 @@ export default function DataTable<T extends { [key: string]: any }>({
   searchable = false,
   onSearch,
   title,
+  onRowClick,
 }: DataTableProps<T>) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState("")
@@ -59,7 +61,7 @@ export default function DataTable<T extends { [key: string]: any }>({
   }
 
   const getRowId = (item: T) => {
-    return item.id || item.applicationId || item.studentId || item.TransID || Math.random().toString()
+    return item.id || item.applicationId || item.studentId || item.TransID || Math.random().toString() || item.examId
   }
 
   if (loading) {
@@ -127,8 +129,14 @@ export default function DataTable<T extends { [key: string]: any }>({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className={`hover:bg-gray-50 ${expandableRow ? "cursor-pointer" : ""}`}
-                      onClick={() => expandableRow && toggleRow(rowId)}
+                      className={`${expandableRow ? "cursor-pointer" : ""} ${onRowClick ? "cursor-pointer hover:bg-gray-50" : "hover:bg-gray-50"}`}
+                      onClick={() => {
+                        if (onRowClick) {
+                          onRowClick(item)
+                        } else if (expandableRow) {
+                          toggleRow(rowId)
+                        }
+                      }}
                     >
                       {expandableRow && (
                         <td className="px-4 py-3">

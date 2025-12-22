@@ -10,6 +10,7 @@ import type { Student,  Campus } from "@/types/students.types"
 import type { Program } from "@/types/programs.types"
 import { exportStudentsToCSV } from "@/utils/csvExport"
 import DocumentsViewer from "@/app/components/common/DocumentsViewer"
+import DocumentsEditor from "@/app/components/common/DocumentsEditor"
 import { studentsService } from "@/services/students.api"
 import EditStudentModal from "../components/edit-student-modal"
 
@@ -22,6 +23,8 @@ export default function EnrolledStudentsPage() {
   const [filters, setFilters] = useState<FilterOptions>({})
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [docEditorOpen, setDocEditorOpen] = useState(false)
+  const [docEditorStudent, setDocEditorStudent] = useState<Student | null>(null)
   const [programs, setPrograms] = useState<Program[]>([])
   const [campuses, setCampuses] = useState<Campus[]>([])
 
@@ -204,6 +207,17 @@ export default function EnrolledStudentsPage() {
             applicantId={student?.applicant?.applicantId}
             applicantName={`${student?.applicant?.firstName} ${student?.applicant?.lastName}`}
           />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setDocEditorStudent(student)
+                setDocEditorOpen(true)
+              }}
+              className="px-3 py-1 text-xs bg-gray-100 rounded-md hover:bg-gray-200"
+            >
+              Edit Documents
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -294,6 +308,25 @@ export default function EnrolledStudentsPage() {
         }}
         onSuccess={handleEditSuccess}
         student={selectedStudent}
+      />
+
+      <DocumentsEditor
+        isOpen={docEditorOpen}
+        onClose={() => {
+          setDocEditorOpen(false)
+          setDocEditorStudent(null)
+        }}
+        onSuccess={() => {
+          fetchStudents()
+          setDocEditorOpen(false)
+          setDocEditorStudent(null)
+        }}
+        applicantId={docEditorStudent?.applicant?.applicantId ?? 0}
+        applicationId={docEditorStudent?.application?.applicationId ?? 0}
+        applicantInfo={docEditorStudent?.applicant}
+        programId={docEditorStudent?.application?.program?.programId ?? 0}
+        campusId={docEditorStudent?.application?.campus?.id ?? 0}
+        paymentReference={docEditorStudent?.application?.paymentReference}
       />
     </div>
   )

@@ -466,9 +466,14 @@ export default function ProgramDetailPage() {
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {unit.code}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-900">
+                          <td className="px-4 py-4 text-sm text-gray-900 cursor-pointer"   onClick={() => router.push(`/programs/${programId}/course-units/${unit.unitId}`)}>
                             <div>
-                              <div className="font-medium">{unit.name}</div>
+                              <button
+                              
+                                className="font-medium text-left hover:underline"
+                              >
+                                {unit.name}
+                              </button>
                               <div className="text-gray-500 text-xs mt-1 line-clamp-2">
                                 {unit.description}
                               </div>

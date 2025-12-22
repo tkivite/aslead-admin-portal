@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   // output: "export",
   /* config options here */
   images: { unoptimized: true },
@@ -10,6 +10,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-};
+} as unknown as NextConfig;
 
 export default nextConfig;

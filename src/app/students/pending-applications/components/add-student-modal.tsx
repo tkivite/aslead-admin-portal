@@ -110,6 +110,7 @@ export default function AddStudentModal({
         paymentReference: `ADMIN_${Date.now()}`,
         applicantInfo: {
           firstName: studentData.firstName,
+          middleName: studentData.middleName,
           lastName: studentData.lastName,
           email: studentData.email || null,
           mobile: studentData.mobileNumber,

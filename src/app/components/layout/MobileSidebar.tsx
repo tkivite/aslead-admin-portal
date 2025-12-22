@@ -14,7 +14,8 @@ import {
   Smartphone,
   X,
   BookOpen,
-  MapPin
+  MapPin,
+  FileCheckIcon
 } from "lucide-react";
 import { useAppSelector } from "@/lib/hooks";
 
@@ -39,6 +40,9 @@ const rolePermissions = {
     "student-statements",
     "programs",
     "campuses",
+    "exam-types",
+    "grading-systems",
+    "exams",
   ],
   finance: ["dashboard", "students", "payments", "finance"],
   instructor: ["dashboard", "students", "courses", "messaging"],
@@ -100,7 +104,14 @@ export default function MobileSidebar({ isOpen, onClose, userRole = "admin" }: M
         },
       ],
     },
+  
     {
+      name: "Administration",
+      path: "#",
+      icon: FileCheckIcon,
+      key: "administration",
+      submenu: [
+          {
       name: "Programs",
       path: "/programs",
       icon: BookOpen,
@@ -111,6 +122,35 @@ export default function MobileSidebar({ isOpen, onClose, userRole = "admin" }: M
       path: "/campuses",
       icon: MapPin,
       key: "campuses",
+    }]
+  
+  
+    },
+    {
+      name: "Exams",
+      path: "#",
+      icon: FileCheckIcon,
+      key: "exams",
+      submenu: [
+        {
+          name: "Exams",
+          path: "/exams",
+          icon: FileCheckIcon,
+          key: "exams",
+        },
+        {
+          name: "Exam Types",
+          path: "/exam-types",
+          icon: BookOpen,
+          key: "exam-types",
+        },
+        {
+          name: "Grading System",
+          path: "/grading-systems",
+          icon: BookOpen,
+          key: "grading-systems",
+        },
+      ],
     },
     {
       name: "Finance",

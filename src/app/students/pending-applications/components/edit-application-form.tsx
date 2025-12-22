@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Upload, X } from "lucide-react";
-import Image from "next/image";
+import { Loader2 } from "lucide-react";
+
 import type {  Campus } from "@/types/students.types";
 import type { Program } from "@/types/programs.types";
 import type { EditApplicationFormData } from "./edit-application-modal";
@@ -26,15 +26,7 @@ export default function EditApplicationForm({
   submitting,
 }: EditApplicationFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [imagePreview, setImagePreview] = useState<{
-    nationalId: string | null;
-    passportPhoto: string | null;
-    otherDocument: string | null;
-  }>({
-    nationalId: null,
-    passportPhoto: null,
-    otherDocument: null,
-  });
+
 
   const handleInputChange = (
     field: keyof EditApplicationFormData,
@@ -46,42 +38,7 @@ export default function EditApplicationForm({
     }));
   };
 
-  const handleDocumentChange = (
-    field: keyof EditApplicationFormData["documents"],
-    value: string
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      documents: {
-        ...prev.documents,
-        [field]: value,
-      },
-    }));
-  };
 
-  const handleFileUpload = (
-    field: keyof EditApplicationFormData["documents"],
-    file: File
-  ) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      handleDocumentChange(field, result);
-      setImagePreview((prev) => ({
-        ...prev,
-        [field]: result,
-      }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const removeDocument = (field: keyof EditApplicationFormData["documents"]) => {
-    handleDocumentChange(field, "");
-    setImagePreview((prev) => ({
-      ...prev,
-      [field]: null,
-    }));
-  };
 
   const handleSubmit = () => {
     onSubmit(formData);
@@ -98,7 +55,7 @@ export default function EditApplicationForm({
   const steps = [
     { number: 1, title: "Personal Information" },
     { number: 2, title: "Program & Campus" },
-    { number: 3, title: "Documents & Payment" },
+    { number: 3, title: "Payment Information" },
   ];
 
   return (
@@ -358,7 +315,7 @@ export default function EditApplicationForm({
             className="space-y-6"
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Documents & Payment Information
+              Payment Information
             </h3>
             
             <div className="space-y-6">
@@ -375,164 +332,7 @@ export default function EditApplicationForm({
                 />
               </div>
 
-              {/* Document Upload Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* National ID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    National ID Document
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    {imagePreview.nationalId ? (
-                      <div className="space-y-2">
-                        <div className="relative w-full h-32 rounded overflow-hidden">
-                          <Image
-                            src={imagePreview.nationalId}
-                            alt="National ID Preview"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeDocument("nationalId")}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          <X className="w-4 h-4 inline mr-1" />
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 mb-2">
-                          Upload National ID
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload("nationalId", file);
-                          }}
-                          className="hidden"
-                          id="nationalId"
-                        />
-                        <label
-                          htmlFor="nationalId"
-                          className="cursor-pointer text-primary hover:text-primary/80 text-sm font-medium"
-                        >
-                          Choose File
-                        </label>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Passport Photo */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Passport Photo
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    {imagePreview.passportPhoto ? (
-                      <div className="space-y-2">
-                        <div className="relative w-full h-32 rounded overflow-hidden">
-                          <Image
-                            src={imagePreview.passportPhoto}
-                            alt="Passport Photo Preview"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeDocument("passportPhoto")}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          <X className="w-4 h-4 inline mr-1" />
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 mb-2">
-                          Upload Passport Photo
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload("passportPhoto", file);
-                          }}
-                          className="hidden"
-                          id="passportPhoto"
-                        />
-                        <label
-                          htmlFor="passportPhoto"
-                          className="cursor-pointer text-primary hover:text-primary/80 text-sm font-medium"
-                        >
-                          Choose File
-                        </label>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Other Document */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Other Document
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    {imagePreview.otherDocument ? (
-                      <div className="space-y-2">
-                        <div className="relative w-full h-32 rounded overflow-hidden">
-                          <Image
-                            src={imagePreview.otherDocument}
-                            alt="Other Document Preview"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeDocument("otherDocument")}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          <X className="w-4 h-4 inline mr-1" />
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 mb-2">
-                          Upload Other Document
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload("otherDocument", file);
-                          }}
-                          className="hidden"
-                          id="otherDocument"
-                        />
-                        <label
-                          htmlFor="otherDocument"
-                          className="cursor-pointer text-primary hover:text-primary/80 text-sm font-medium"
-                        >
-                          Choose File
-                        </label>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+             
             </div>
           </motion.div>
         )}

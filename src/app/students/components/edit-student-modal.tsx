@@ -79,7 +79,6 @@ export default function EditStudentModal({
   const [campuses, setCampuses] = useState<Campus[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [documentsLoading, setDocumentsLoading] = useState(false);
 
   const populateFormData = useCallback(() => {
     if (!student) return;
@@ -129,7 +128,7 @@ export default function EditStudentModal({
 
   const fetchDocuments = async (applicantId: number) => {
     try {
-      setDocumentsLoading(true);
+     
       const documents: Document[] = await applicationsService.getApplicantDocuments(applicantId);
       
       // Map documents to form fields based on documentType
@@ -160,9 +159,7 @@ export default function EditStudentModal({
       }));
     } catch (error) {
       console.error("Error fetching documents:", error);
-      // Continue with empty documents if fetch fails
-    } finally {
-      setDocumentsLoading(false);
+      
     }
   };
 
@@ -324,7 +321,7 @@ export default function EditStudentModal({
                 programs={programs}
                 campuses={campuses}
                 submitting={submitting}
-                documentsLoading={documentsLoading}
+              
               />
             )}
           </motion.div>

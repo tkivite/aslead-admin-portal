@@ -137,6 +137,23 @@ export const applicationsService = {
      return response.data.body || [];
   },
 
+
+
+  // Add a new document for an applicant
+  addApplicantDocument: async (payload: {
+    applicant: { applicantId: number };
+    documentType: string;
+    content: string;
+  }): Promise<Document> => {
+    const response = await api.post<{ body: Document }>(`/application/api/documents`, payload);
+    return response.data.body;
+  },
+
+  // Delete a document by id
+  deleteDocument: async (documentId: number): Promise<void> => {
+    await api.delete(`/application/api/documents/${documentId}`);
+  },
+
   // Update application
   updateApplication: async (
     applicationId: number,

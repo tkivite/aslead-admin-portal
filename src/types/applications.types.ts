@@ -63,6 +63,8 @@ export interface Applicant {
   currentEducationLevel: string;
   createdAt: string;
   updatedAt: string;
+  documentType?: string;
+  documentNumber?: string | number;
 }
 export interface Document {
 
@@ -74,7 +76,7 @@ export interface Document {
 
 
 export interface DocumentResponse {
-  headers: Record<string, any>;
+  headers: Record<string, string>;
   body: Document[];
   statusCode: string;
   statusCodeValue: number;
