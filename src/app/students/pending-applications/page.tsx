@@ -159,7 +159,7 @@ export default function PendingApplicationsPage() {
       render: (app: Application) => (
         <div>
           <div className="text-sm font-medium text-textDark">
-            {app?.applicant?.firstName} {app?.applicant?.lastName}
+            {app.applicant.firstName} {app.applicant.middleName} {app.applicant.lastName}
           </div>
           <div className="text-xs text-gray-500">{app?.applicant?.email}</div>
         </div>

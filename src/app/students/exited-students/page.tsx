@@ -72,7 +72,7 @@ export default function ExitedStudentsPage() {
       render: (student: Student) => (
         <div>
           <div className="text-sm font-medium text-textDark">
-            {student.applicant.firstName} {student.applicant.lastName}
+            {student.applicant.firstName} {student.applicant.middleName} {student.applicant.lastName}
           </div>
           <div className="text-xs text-gray-500">{student.applicant.email}</div>
         </div>
@@ -192,7 +192,7 @@ export default function ExitedStudentsPage() {
        <div className="space-y-2">
         <DocumentsViewer
           applicantId={student.applicant.applicantId}
-          applicantName={`${student.applicant.firstName} ${student.applicant.lastName}`}
+          applicantName={`${student.applicant.firstName} ${student.applicant.middleName} ${student.applicant.lastName}`}
         />
       </div>
     </div>
