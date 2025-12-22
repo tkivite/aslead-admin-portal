@@ -12,14 +12,21 @@ import {
   GraduationCap,
   Check,
   Plus,
+  Edit,
 } from "lucide-react";
 import DataTable from "@/app/components/common/DataTable";
-import type { Application } from "@/types/applications.types";
+import TableFilters, { FilterOptions } from "@/app/components/common/TableFilters";
+import type { Application, Document } from "@/types/applications.types";
+import type { Campus } from "@/types/students.types";
+import type { Program } from "@/types/programs.types";
 import AddStudentModal from "./components/add-student-modal";
 import ApprovalModal from "./components/approval-modal";
+import EditApplicationModal from "./components/edit-application-modal";
 import { exportApplicationsToCSV } from "@/utils/csvExport";
 import { applicationsService } from "@/services/applications.api";
+import { studentsService } from "@/services/students.api";
 import DocumentsViewer from "@/app/components/common/DocumentsViewer";
+import DocumentsEditor from "@/app/components/common/DocumentsEditor";
 
 export default function PendingApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -30,7 +37,14 @@ export default function PendingApplicationsPage() {
   const [approvingIds, setApprovingIds] = useState<Set<number>>(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [docEditorOpen, setDocEditorOpen] = useState(false);
+  const [docEditorApp, setDocEditorApp] = useState<Application | null>(null);
+  const [docCache, setDocCache] = useState<Record<number, Document[]>>({});
+  const [filters, setFilters] = useState<FilterOptions>({});
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [campuses, setCampuses] = useState<Campus[]>([]);
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -38,7 +52,8 @@ export default function PendingApplicationsPage() {
       const response = await applicationsService.getPaginatedApplications(
         currentPage,
         10,
-        "PENDING"
+        "PENDING",
+        filters
       );
       setApplications(response.content);
       setTotalPages(response.totalPages);
@@ -48,15 +63,35 @@ export default function PendingApplicationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage]);
+  }, [currentPage, filters]);
+
 
   useEffect(() => {
     fetchApplications();
-  }, []);
+    fetchProgramsAndCampuses();
+  }, [fetchApplications]);
+
+  const fetchProgramsAndCampuses = async () => {
+    try {
+      const [programsData, campusesData] = await Promise.all([
+        studentsService.getPrograms(),
+        studentsService.getCampuses(),
+      ]);
+      setPrograms(programsData);
+      setCampuses(campusesData);
+    } catch (error) {
+      console.error("Error fetching programs and campuses:", error);
+    }
+  };
 
   const handleApproveClick = (application: Application) => {
     setSelectedApplication(application);
     setShowApprovalModal(true);
+  };
+
+  const handleEditClick = (application: Application) => {
+    setSelectedApplication(application);
+    setShowEditModal(true);
   };
 
   const handleApproveApplication = async (startYear: number, startMonth: string) => {
@@ -66,7 +101,7 @@ export default function PendingApplicationsPage() {
       setApprovingIds((prev) => new Set(prev).add(selectedApplication.applicationId));
 
       await applicationsService.approveApplication(
-        selectedApplication.applicant.applicantId,
+        selectedApplication?.applicant?.applicantId,
         selectedApplication.applicationId,
         startYear,
         startMonth
@@ -105,6 +140,10 @@ export default function PendingApplicationsPage() {
     fetchApplications(); // Refresh the students list
   };
 
+  const handleEditApplicationSuccess = () => {
+    fetchApplications(); // Refresh the applications list
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -122,7 +161,7 @@ export default function PendingApplicationsPage() {
           <div className="text-sm font-medium text-textDark">
             {app.applicant.firstName} {app.applicant.middleName} {app.applicant.lastName}
           </div>
-          <div className="text-xs text-gray-500">{app.applicant.email}</div>
+          <div className="text-xs text-gray-500">{app?.applicant?.email}</div>
         </div>
       ),
     },
@@ -180,6 +219,16 @@ export default function PendingApplicationsPage() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              handleEditClick(app);
+            }}
+            className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          >
+            <Edit className="w-3 h-3" />
+            Edit
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               handleApproveClick(app);
             }}
             disabled={approvingIds.has(app.applicationId)}
@@ -212,23 +261,23 @@ export default function PendingApplicationsPage() {
         <div className="text-sm space-y-1">
           <p className="flex items-center gap-2">
             <Phone className="h-3 w-3" />
-            <span className="font-medium">Mobile:</span> {app.applicant.mobile}
+            <span className="font-medium">Mobile:</span> {app?.applicant?.mobile}
           </p>
           <p className="flex items-center gap-2">
             <Mail className="h-3 w-3" />
-            <span className="font-medium">Email:</span> {app.applicant.email}
+            <span className="font-medium">Email:</span> {app?.applicant?.email}
           </p>
           <p>
             <span className="font-medium">DOB:</span>{" "}
-            {formatDate(app.applicant.dob)}
+            {formatDate(app?.applicant?.dob)}
           </p>
           <p>
             <span className="font-medium">Education:</span>{" "}
-            {app.applicant.currentEducationLevel}
+            {app?.applicant?.currentEducationLevel}
           </p>
           <p>
             <span className="font-medium">Citizenship:</span>{" "}
-            {app.applicant.citizenship}
+            {app?.applicant?.citizenship}
           </p>
         </div>
       </div>
@@ -285,10 +334,23 @@ export default function PendingApplicationsPage() {
       </div>
 
       <div className="space-y-2">
-        <DocumentsViewer
-          applicantId={app?.applicant?.applicantId}
-          applicantName={`${app.applicant?.firstName} ${app?.applicant?.lastName}`}
-        />
+        <div className="flex items-center gap-3">
+          <DocumentsViewer
+            applicantId={app?.applicant?.applicantId}
+            applicantName={`${app.applicant?.firstName} ${app?.applicant?.lastName}`}
+            onDocumentsFetched={(docs) => setDocCache((prev) => ({ ...prev, [app.applicationId]: docs }))}
+            initialDocuments={docCache[app.applicationId]}
+          />
+          <button
+            onClick={() => {
+              setDocEditorApp(app);
+              setDocEditorOpen(true);
+            }}
+            className="px-3 py-1 text-xs bg-gray-100 rounded-md hover:bg-gray-200"
+          >
+            Edit Documents
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -298,21 +360,14 @@ export default function PendingApplicationsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-2">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-textDark mb-2">
-              Pending Applications
-            </h1>
-            <p className="text-gray-600">
-              Manage and review pending student applications
-            </p>
-          </div>
+        <div className="flex items-center justify-between">
+          <div />
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors"
@@ -328,6 +383,30 @@ export default function PendingApplicationsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
+        <TableFilters
+          onFiltersChange={setFilters}
+          showStatusFilter={false}
+          showDateRangeFilter={true}
+          showSearchFilter={true}
+          showSortFilter={true}
+          showCampusFilter={true}
+          showProgramFilter={true}
+          campusOptions={campuses.map((campus) => ({
+            value: campus.id,
+            label: `${campus.name} - ${campus.location}`,
+          }))}
+          programOptions={programs.map((program) => ({
+            value: program.programId,
+            label: `${program.name} - ${program.code}`,
+          }))}
+          sortOptions={[
+            { value: "createdAt", label: "Created Date" },
+            { value: "updatedAt", label: "Updated Date" },
+            { value: "firstName", label: "First Name" },
+            { value: "lastName", label: "Last Name" },
+          ]}
+        />
+
         <DataTable
           data={applications}
           columns={columns}
@@ -343,12 +422,38 @@ export default function PendingApplicationsPage() {
           title={`Pending Applications (${totalElements})`}
         />
       </motion.div>
-       <AddStudentModal
+
+      <AddStudentModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSuccess={handleAddStudentSuccess}
       />
-      
+
+      <DocumentsEditor
+        isOpen={docEditorOpen}
+        onClose={() => {
+          setDocEditorOpen(false);
+          setDocEditorApp(null);
+        }}
+        onSuccess={() => {
+          fetchApplications();
+          setDocEditorOpen(false);
+          setDocEditorApp(null);
+        }}
+        applicantId={docEditorApp?.applicant?.applicantId ?? 0}
+        applicationId={docEditorApp?.applicationId ?? 0}
+        applicantInfo={docEditorApp?.applicant}
+        programId={docEditorApp?.program?.programId ?? 0}
+        campusId={docEditorApp?.campus?.id ?? 0}
+        paymentReference={docEditorApp?.paymentReference}
+        initialDocuments={docEditorApp ? docCache[docEditorApp.applicationId] : undefined}
+        onDocumentsUpdated={(docs) => {
+          if (docEditorApp) {
+            setDocCache((prev) => ({ ...prev, [docEditorApp.applicationId]: docs }));
+          }
+        }}
+      />
+
       <ApprovalModal
         isOpen={showApprovalModal}
         onClose={() => {
@@ -359,6 +464,16 @@ export default function PendingApplicationsPage() {
         application={selectedApplication}
         isSubmitting={selectedApplication ? approvingIds.has(selectedApplication.applicationId) : false}
       />
+
+      <EditApplicationModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setSelectedApplication(null);
+        }}
+        onSuccess={handleEditApplicationSuccess}
+        application={selectedApplication}
+      />
     </div>
-  );
+  )
 }

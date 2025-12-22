@@ -23,7 +23,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const checkAuth = async () => {
+  const checkAuth = React.useCallback(async () => {
     try {
       setIsLoading(true);
       const isValid = await authService.ensureValidToken();
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const login = async (username: string, password: string) => {
     try {
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Check authentication on mount
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   const value: AuthContextType = {
     isAuthenticated,

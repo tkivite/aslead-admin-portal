@@ -1,38 +1,53 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { FileText, /* Download, */ Eye, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { applicationsService } from "@/services/applications.api"
 import { Document } from "@/types/applications.types"
-import Image from "next/image"
 
 interface DocumentsViewerProps {
   applicantId: number
   applicantName: string
+  onDocumentsFetched?: (docs: Document[]) => void
+  initialDocuments?: Document[]
 }
 
-export default function DocumentsViewer({ applicantId, applicantName }: DocumentsViewerProps) {
+export default function DocumentsViewer({ applicantId, applicantName, onDocumentsFetched, initialDocuments }: DocumentsViewerProps) {
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
-  useEffect(() => {
-    fetchDocuments()
-  }, [applicantId])
-
-  const fetchDocuments = async () => {
+  const fetchDocuments = React.useCallback(async () => {
     try {
       setLoading(true)
       const docs = await applicationsService.getApplicantDocuments(applicantId)
       setDocuments(docs)
+      // notify parent that documents have been fetched so they can reuse them
+      if (typeof onDocumentsFetched === "function") {
+        onDocumentsFetched(docs)
+      }
     } catch (error) {
       console.error("Error fetching documents:", error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [applicantId, onDocumentsFetched])
+
+  useEffect(() => {
+    // If parent provided initial documents, use them and avoid fetching
+    if (initialDocuments && Array.isArray(initialDocuments)) {
+      setDocuments(initialDocuments)
+      setLoading(false)
+      if (typeof onDocumentsFetched === "function") {
+        onDocumentsFetched(initialDocuments)
+      }
+      return
+    }
+
+    fetchDocuments()
+  }, [applicantId, initialDocuments, fetchDocuments, onDocumentsFetched])
 
   // Get image data URL - content is already base64 encoded
   const getImageDataUrl = (document: Document): string => {
@@ -183,7 +198,7 @@ export default function DocumentsViewer({ applicantId, applicantName }: Document
                   {isViewable ? (
                     <div className="aspect-square cursor-pointer" onClick={() => openImageModal(document, viewableIndex)}>
                       {isImage ? (
-                        <Image
+                        <img
                           src={getImageDataUrl(document) || "/placeholder.svg"}
                           alt={document.documentType}
                           className="w-full h-full object-cover"
@@ -294,7 +309,7 @@ export default function DocumentsViewer({ applicantId, applicantName }: Document
                     />
                   </div>
                 ) : (
-                  <Image
+                  <img
                     src={getImageDataUrl(selectedDocument) || "/placeholder.svg"}
                     alt={selectedDocument.documentType}
                     className="max-w-full max-h-[70vh] object-contain mx-auto"

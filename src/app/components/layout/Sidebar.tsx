@@ -19,7 +19,10 @@ import {
   Settings, */
   Users,
   UserCog,
-  Smartphone
+  Smartphone,
+  BookOpen,
+  MapPin,
+  FileCheckIcon
 } from "lucide-react"
 import { useAppSelector } from "@/lib/hooks"
 
@@ -42,6 +45,11 @@ const rolePermissions = {
     "all-payments",
     "mpesa-payments",
     "student-statements",
+    "programs",
+    "campuses",
+    "exams",
+    "exam-types",
+    "grading-systems",
   ],
   finance: ["dashboard", "students", "payments", "finance"],
   instructor: ["dashboard", "students", "courses", "messaging"],
@@ -113,6 +121,55 @@ const menuItems: MenuItem[] = [
         path: "/students/exited-students",
         icon: UserCog,
         key: "exited-students",
+      },
+    ],
+  },
+
+  {
+    name: "Administration",
+    path: "#",
+    icon: FileCheckIcon,
+    key: "administration",
+    submenu: [
+        {
+    name: "Programs",
+    path: "/programs",
+    icon: BookOpen,
+    key: "programs",
+  },
+  {
+    name: "Campuses",
+    path: "/campuses",
+    icon: MapPin,
+    key: "campuses",
+  }]
+
+
+  },
+
+  {
+    name: "Exams",
+    path: "#",
+    icon: FileCheckIcon,
+    key: "exams",
+    submenu: [
+      {
+        name: "Exams",
+        path: "/exams",
+        icon: FileCheckIcon,
+        key: "exams",
+      },
+      {
+        name: "Exam Types",
+        path: "/exam-types",
+        icon: BookOpen,
+        key: "exam-types",
+      },
+      {
+        name: "Grading System",
+        path: "/grading-systems",
+        icon: BookOpen,
+        key: "grading-systems",
       },
     ],
   },

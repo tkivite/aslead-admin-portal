@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Clock, Receipt, Smartphone } from "lucide-react"
 import DataTable from "@/app/components/common/DataTable"
@@ -14,11 +14,7 @@ export default function MpesaPaymentsPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
 
-  useEffect(() => {
-    fetchPayments()
-  }, [currentPage])
-
-  const fetchPayments = async () => {
+  const fetchPayments = React.useCallback(async () => {
     try {
       setLoading(true)
       const response = await paymentsService.getMpesaPayments(currentPage, 10)
@@ -30,7 +26,11 @@ export default function MpesaPaymentsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage])
+
+  useEffect(() => {
+    fetchPayments()
+  }, [])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

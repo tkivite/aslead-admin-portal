@@ -1,21 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
-import AddStudentForm from "./add-student-form";
-import type { Campus } from "@/types/students.types";
+import EditApplicationForm from "./edit-application-form";
+import type {  Campus } from "@/types/students.types";
 import type { Program } from "@/types/programs.types";
+import type { Application } from "@/types/applications.types";
 import { studentsService } from "@/services/students.api";
+import { applicationsService } from "@/services/applications.api";
 
-interface AddStudentModalProps {
+interface EditApplicationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  application: Application | null;
 }
 
-export interface StudentFormData {
+export interface EditApplicationFormData {
   mobileNumber: string;
   firstName: string;
   middleName: string;
@@ -30,23 +33,26 @@ export interface StudentFormData {
   additionalInfo: string;
   programId: string;
   campusId: string;
+  paymentReference: string;
   documents: {
     nationalId: string;
     passportPhoto: string;
     otherDocument: string;
   };
+  applicantId:string
 }
 
-export default function AddStudentModal({
+export default function EditApplicationModal({
   isOpen,
   onClose,
   onSuccess,
-}: AddStudentModalProps) {
+  application,
+}: EditApplicationModalProps) {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [campuses, setCampuses] = useState<Campus[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState<StudentFormData>({
+  const [formData, setFormData] = useState<EditApplicationFormData>({
     mobileNumber: "",
     firstName: "",
     middleName: "",
@@ -61,19 +67,50 @@ export default function AddStudentModal({
     additionalInfo: "",
     programId: "",
     campusId: "",
+    paymentReference: "",
     documents: {
       nationalId: "",
       passportPhoto: "",
       otherDocument: "",
     },
+    applicantId:""
   });
 
+  const populateFormData = useCallback(() => {
+    if (!application) return;
+
+    setFormData({
+      mobileNumber: application?.applicant?.mobile,
+      firstName: application?.applicant?.firstName,
+      middleName: "", // Not available in Application type
+      lastName: application?.applicant?.lastName,
+      email: application?.applicant?.email,
+      gender: application?.applicant?.gender,
+      dateOfBirth: application?.applicant?.dob,
+      identityType: application?.applicant?.documentType,
+      identityNumber: application?.applicant?.documentNumber.toString(),
+      citizenship: application?.applicant?.citizenship,
+      currentEducationLevel: application?.applicant?.currentEducationLevel,
+      additionalInfo: "", // Not available in Application type
+      programId: application.program.programId.toString(),
+      campusId: application.campus.id.toString(),
+      applicantId:application?.applicant.applicantId?.toString(),
+      paymentReference: application.paymentReference,
+      documents: {
+        nationalId: "",
+        passportPhoto: "",
+        otherDocument: "",
+      },
+    });
+  }, [application]);
+
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && application) {
       fetchPrograms();
       fetchCampuses();
+      populateFormData();
     }
-  }, [isOpen]);
+  }, [isOpen, application, populateFormData]);
 
   const fetchPrograms = async () => {
     try {
@@ -98,68 +135,69 @@ export default function AddStudentModal({
     }
   };
 
-  const handleSubmit = async (studentData: StudentFormData) => {
+  const handleSubmit = async (applicationData: EditApplicationFormData) => {
+    if (!application) return;
+
     setSubmitting(true);
 
     try {
       // Prepare the payload
       const payload = {
-        programId: Number.parseInt(studentData.programId),
-        campusId: Number.parseInt(studentData.campusId),
-        additionalInfo: studentData.additionalInfo || "Added by admin",
-        paymentReference: `ADMIN_${Date.now()}`,
+        programId: Number.parseInt(applicationData.programId),
+        admissionCycleId: null,
+        campusId: Number.parseInt(applicationData.campusId),
+        applicantId:Number.parseInt(applicationData.applicantId),
+        additionalInfo: applicationData.additionalInfo || "Updated by admin",
+        paymentReference: applicationData.paymentReference,
         applicantInfo: {
-          firstName: studentData.firstName,
-          middleName: studentData.middleName,
-          lastName: studentData.lastName,
-          email: studentData.email || null,
-          mobile: studentData.mobileNumber,
-          dob: studentData.dateOfBirth,
-          gender: studentData.gender,
-          citizenship: studentData.citizenship,
-          currentEducationLevel: studentData.currentEducationLevel,
-          documentType: studentData.identityType,
-          documentNumber: studentData.identityNumber,
+          firstName: applicationData.firstName,
+          lastName: applicationData.lastName,
+          email: applicationData.email || "",
+          mobile: applicationData.mobileNumber,
+          dob: applicationData.dateOfBirth,
+          citizenship: applicationData.citizenship,
+          currentEducationLevel: applicationData.currentEducationLevel,
+          documentType: applicationData.identityType,
+          documentNumber: applicationData.identityNumber,
+          gender:applicationData.gender
         },
         documents: [] as Array<{
           documentType: string;
           content: string;
-          status: "PENDING";
         }>,
+         
       };
 
       // Add documents if provided
-      if (studentData.documents.nationalId) {
+      if (applicationData.documents.nationalId) {
         payload.documents.push({
           documentType: "NATIONAL_ID",
-          content: studentData.documents.nationalId,
-          status: "PENDING",
+          content: applicationData.documents.nationalId,
         });
       }
 
-      if (studentData.documents.passportPhoto) {
+      if (applicationData.documents.passportPhoto) {
         payload.documents.push({
           documentType: "PASSPORT_PHOTO",
-          content: studentData.documents.passportPhoto,
-          status: "PENDING",
+          content: applicationData.documents.passportPhoto,
         });
       }
 
-      if (studentData.documents.otherDocument) {
+      if (applicationData.documents.otherDocument) {
         payload.documents.push({
           documentType: "OTHER",
-          content: studentData.documents.otherDocument,
-          status: "PENDING",
+          content: applicationData.documents.otherDocument,
         });
       }
 
-      await studentsService.addStudent(payload);
+      await applicationsService.updateApplication(application.applicationId, payload);
 
-      toast.success("Student added successfully!");
+      toast.success("Application updated successfully!");
       onSuccess();
       handleClose();
     } catch (error) {
-      console.error("Error adding student:", error);
+      console.error("Error updating application:", error);
+      toast.error("Failed to update application. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -181,18 +219,20 @@ export default function AddStudentModal({
       additionalInfo: "",
       programId: "",
       campusId: "",
+      paymentReference: "",
       documents: {
         nationalId: "",
         passportPhoto: "",
         otherDocument: "",
       },
+      applicantId:""
     });
     onClose();
   };
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && application && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
           <motion.div
@@ -213,7 +253,7 @@ export default function AddStudentModal({
             {/* Modal Header */}
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-900">
-                Add New Student
+                Edit Application - {application?.applicant?.firstName} {application?.applicant?.lastName}
               </h3>
               <button
                 onClick={handleClose}
@@ -231,7 +271,7 @@ export default function AddStudentModal({
                 </span>
               </div>
             ) : (
-              <AddStudentForm
+              <EditApplicationForm
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={handleSubmit}

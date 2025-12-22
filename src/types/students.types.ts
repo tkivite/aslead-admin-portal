@@ -15,6 +15,8 @@ export interface Student {
     currentEducationLevel: string;
     createdAt: string;
     updatedAt: string;
+    documentType: string;
+    documentNumber: number;
   };
   application: Application;
   enrollmentStatus: string;
@@ -22,23 +24,6 @@ export interface Student {
   createdAt: string;
   updatedAt: string;
   admissionNumber: string;
-}
-export interface Program {
-  programId: number;
-  code: string;
-  name: string;
-  description: string;
-  durationMonths: number;
-  tuitionFee: number;
-  applicationFee: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  costs?: Array<{
-    id: number;
-    description: string;
-    amount: number;
-  }>;
 }
 
 export interface Campus {
@@ -48,7 +33,22 @@ export interface Campus {
   address?: string;
   phone?: string;
   email?: string;
-  status: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface EditStudentData {
+  applicantInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    mobile: string;
+    dob: string;
+    gender: string;
+    citizenship: string;
+    currentEducationLevel: string;
+  };
+  programId: number;
+  campusId: number;
+  enrollmentStatus: string;
 }

@@ -83,9 +83,9 @@ export default function RecentApplicationsTable({ applications, loading = false 
                   <td className="px-4 py-3">
                     <div>
                       <div className="text-sm font-medium text-textDark">
-                        {application.applicant.firstName} {application.applicant.lastName}
+                        {application?.applicant?.firstName} {application?.applicant?.lastName}
                       </div>
-                      <div className="text-xs text-gray-500">{application.applicant.email}</div>
+                      <div className="text-xs text-gray-500">{application?.applicant?.email}</div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -131,17 +131,17 @@ export default function RecentApplicationsTable({ applications, loading = false 
                             </h4>
                             <div className="text-sm space-y-1">
                               <p>
-                                <span className="font-medium">Mobile:</span> {application.applicant.mobile}
+                                <span className="font-medium">Mobile:</span> {application?.applicant?.mobile}
                               </p>
                               <p>
-                                <span className="font-medium">DOB:</span> {formatDate(application.applicant.dob)}
+                                <span className="font-medium">DOB:</span> {formatDate(application?.applicant?.dob)}
                               </p>
                               <p>
                                 <span className="font-medium">Education:</span>{" "}
-                                {application.applicant.currentEducationLevel}
+                                {application?.applicant?.currentEducationLevel}
                               </p>
                               <p>
-                                <span className="font-medium">Citizenship:</span> {application.applicant.citizenship}
+                                <span className="font-medium">Citizenship:</span> {application?.applicant?.citizenship}
                               </p>
                             </div>
                           </div>

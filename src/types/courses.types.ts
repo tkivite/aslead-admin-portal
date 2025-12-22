@@ -1,4 +1,38 @@
 
+export interface CourseUnit {
+  unitId: number;
+  programId?: number;
+  code: string;
+  name: string;
+  description: string;
+  creditHours: number;
+  academicYear: number;
+  session: number;
+  compuslory: boolean; // Note: API uses "compuslory" (typo in backend)
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CourseUnitCreateRequest {
+  code: string;
+  name: string;
+  description: string;
+  academicYear: number;
+  session: number;
+  compuslory: boolean; // Note: API uses "compuslory" (typo in backend)
+  creditHours: number;
+}
+
+export interface CourseUnitUpdateRequest {
+  code: string;
+  name: string;
+  description: string;
+  academicYear: number;
+  session: number;
+  compuslory: boolean; // Note: API uses "compuslory" (typo in backend)
+  creditHours: number;
+}
+
 export interface AdmissionCycle {
   cycleId: number;
   program: Program;

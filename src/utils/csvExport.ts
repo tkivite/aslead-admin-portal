@@ -54,10 +54,10 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 export function exportApplicationsToCSV(applications: Application[]) {
   const flattenedData = applications.map((app) => ({
     "Application ID": app.applicationId,
-    "First Name": app.applicant.firstName,
-    "Last Name": app.applicant.lastName,
-    Email: app.applicant.email,
-    Mobile: app.applicant.mobile,
+    "First Name": app?.applicant?.firstName,
+    "Last Name": app?.applicant?.lastName,
+    Email: app?.applicant?.email,
+    Mobile: app?.applicant?.mobile,
     "Program Code": app.program.code,
     "Program Name": app.program.name,
     Campus: app.campus.name,

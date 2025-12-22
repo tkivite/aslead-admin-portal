@@ -1,14 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
-import { Calendar, MapPin, User, Phone, Mail, GraduationCap } from "lucide-react"
+import { Calendar, MapPin, User, Phone, Mail, GraduationCap, Edit } from "lucide-react"
 import DataTable from "@/app/components/common/DataTable"
+import TableFilters, { FilterOptions } from "@/app/components/common/TableFilters"
 
-import type { Student } from "@/types/students.types"
+import type { Student,  Campus } from "@/types/students.types"
+import type { Program } from "@/types/programs.types"
 import { exportStudentsToCSV } from "@/utils/csvExport"
 import DocumentsViewer from "@/app/components/common/DocumentsViewer"
+import DocumentsEditor from "@/app/components/common/DocumentsEditor"
 import { studentsService } from "@/services/students.api"
+import EditStudentModal from "../components/edit-student-modal"
 
 export default function EnrolledStudentsPage() {
   const [students, setStudents] = useState<Student[]>([])
@@ -16,15 +20,18 @@ export default function EnrolledStudentsPage() {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
+  const [filters, setFilters] = useState<FilterOptions>({})
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [docEditorOpen, setDocEditorOpen] = useState(false)
+  const [docEditorStudent, setDocEditorStudent] = useState<Student | null>(null)
+  const [programs, setPrograms] = useState<Program[]>([])
+  const [campuses, setCampuses] = useState<Campus[]>([])
 
-  useEffect(() => {
-    fetchStudents()
-  }, [currentPage])
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await studentsService.getPaginatedStudents(currentPage, 10, "ENROLLED")
+      const response = await studentsService.getPaginatedStudents(currentPage, 10, "ENROLLED", filters)
       setStudents(response.content)
       setTotalPages(response.totalPages)
       setTotalElements(response.totalElements)
@@ -33,7 +40,26 @@ export default function EnrolledStudentsPage() {
     } finally {
       setLoading(false)
     }
+  }, [currentPage, filters])
+
+  useEffect(() => {
+    fetchStudents()
+    fetchProgramsAndCampuses()
+  }, [fetchStudents])
+
+  const fetchProgramsAndCampuses = async () => {
+    try {
+      const [programsData, campusesData] = await Promise.all([
+        studentsService.getPrograms(),
+        studentsService.getCampuses(),
+      ])
+      setPrograms(programsData)
+      setCampuses(campusesData)
+    } catch (error) {
+      console.error("Error fetching programs and campuses:", error)
+    }
   }
+
 
 
   const formatDate = (dateString: string) => {
@@ -85,6 +111,19 @@ export default function EnrolledStudentsPage() {
       key: "enrolledAt",
       label: "Enrolled",
       render: (student: Student) => <span className="text-sm text-gray-600">{formatDate(student.enrolledAt)}</span>,
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (student: Student) => (
+        <button
+          onClick={() => handleEditClick(student)}
+          className="flex items-center gap-1 px-2 py-1 text-sm text-primary hover:text-primary/80 hover:bg-primary/10 rounded transition-colors"
+        >
+          <Edit className="w-4 h-4" />
+          Edit
+        </button>
+      ),
     },
   ]
 
@@ -168,6 +207,17 @@ export default function EnrolledStudentsPage() {
             applicantId={student?.applicant?.applicantId}
             applicantName={`${student?.applicant?.firstName} ${student?.applicant?.middleName} ${student?.applicant?.lastName}`}
           />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setDocEditorStudent(student)
+                setDocEditorOpen(true)
+              }}
+              className="px-3 py-1 text-xs bg-gray-100 rounded-md hover:bg-gray-200"
+            >
+              Edit Documents
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -175,6 +225,17 @@ export default function EnrolledStudentsPage() {
 
   const handleExport = () => {
     exportStudentsToCSV(students)
+  }
+
+  const handleEditClick = (student: Student) => {
+    setSelectedStudent(student)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEditSuccess = () => {
+    fetchStudents()
+    setIsEditModalOpen(false)
+    setSelectedStudent(null)
   }
 
   return (
@@ -194,6 +255,34 @@ export default function EnrolledStudentsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
+        <TableFilters
+          onFiltersChange={setFilters}
+          showEnrollmentStatusFilter={false}
+          showDateRangeFilter={true}
+          showSearchFilter={true}
+          showSortFilter={true}
+          showCampusFilter={true}
+          showProgramFilter={true}
+          enrollmentStatusOptions={[
+            { value: "ENROLLED", label: "Enrolled" },
+            { value: "COMPLETED", label: "Completed" },
+            { value: "DROPPED", label: "Dropped" },
+          ]}
+          campusOptions={campuses.map(campus => ({
+            value: campus.id,
+            label: `${campus.name} - ${campus.location}`
+          }))}
+          programOptions={programs.map(program => ({
+            value: program.programId,
+            label: `${program.name} - ${program.code}`
+          }))}
+          sortOptions={[
+            { value: "createdAt", label: "Created Date" },
+            { value: "enrolledAt", label: "Enrolled Date" },
+            { value: "applicant.firstName", label: "First Name" },
+            { value: "applicant.lastName", label: "Last Name" },
+          ]}
+        />
         <DataTable
           data={students}
           columns={columns}
@@ -210,7 +299,35 @@ export default function EnrolledStudentsPage() {
         />
       </motion.div>
 
+      {/* Edit Student Modal */}
+      <EditStudentModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setSelectedStudent(null)
+        }}
+        onSuccess={handleEditSuccess}
+        student={selectedStudent}
+      />
 
+      <DocumentsEditor
+        isOpen={docEditorOpen}
+        onClose={() => {
+          setDocEditorOpen(false)
+          setDocEditorStudent(null)
+        }}
+        onSuccess={() => {
+          fetchStudents()
+          setDocEditorOpen(false)
+          setDocEditorStudent(null)
+        }}
+        applicantId={docEditorStudent?.applicant?.applicantId ?? 0}
+        applicationId={docEditorStudent?.application?.applicationId ?? 0}
+        applicantInfo={docEditorStudent?.applicant}
+        programId={docEditorStudent?.application?.program?.programId ?? 0}
+        campusId={docEditorStudent?.application?.campus?.id ?? 0}
+        paymentReference={docEditorStudent?.application?.paymentReference}
+      />
     </div>
   )
 }
