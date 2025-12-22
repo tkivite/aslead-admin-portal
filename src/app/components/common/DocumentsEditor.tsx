@@ -102,33 +102,79 @@ export default function DocumentsEditor({
       const toAdd = docs.filter((d) => d.isNew && !d.removed);
       const toDelete = docs.filter((d) => d.removed && d.documentId > 0);
 
-      const addPromises =   toAdd.map((d) =>
-        applicationsService.addApplicantDocument({ applicant: { applicantId }, documentType: d.documentType, content: d.content })
-      );
-
+      // First, delete server-side documents for those marked removed
       const deletePromises = toDelete.map((d) => applicationsService.deleteDocument(d.documentId));
+      const deleteResults = await Promise.allSettled(deletePromises);
 
-      // Execute adds and deletes concurrently
-      const results = await Promise.allSettled([...addPromises, ...deletePromises]);
+      // Determine which deletes succeeded/failed
+      const successfulDeletes = toDelete
+        .map((d, idx) => ({ doc: d, result: deleteResults[idx] }))
+        .filter((x) => x.result.status === "fulfilled")
+        .map((x) => x.doc.documentId);
 
-      const addErrors = results.slice(0, addPromises.length).filter((r) => r.status === "rejected");
-      const deleteErrors = results.slice(addPromises.length).filter((r) => r.status === "rejected");
+      const failedDeletes = toDelete
+        .map((d, idx) => ({ doc: d, result: deleteResults[idx] }))
+        .filter((x) => x.result.status === "rejected")
+        .map((x) => x.doc.documentId);
 
-      if (addErrors.length > 0 || deleteErrors.length > 0) {
-        console.error("Some document operations failed:", { addErrors, deleteErrors });
-        toast.warn("Some document changes failed. Check console for details.");
+      if (failedDeletes.length > 0) {
+        console.error("Some document deletions failed:", { failedDeletes });
+        toast.warn("Some document deletions failed. Check console for details.");
       }
 
-      // Re-fetch fresh documents and update both modal and parent cache
-      try {
-        const fresh = await applicationsService.getApplicantDocuments(applicantId);
-        setDocs(fresh || []);
+      // Remove successfully deleted docs from local state, and restore 'removed' flag for failures
+      setDocs((prev) => {
+        const afterDeletes = prev
+          .filter((d) => !successfulDeletes.includes(d.documentId))
+          .map((d) => (failedDeletes.includes(d.documentId) ? { ...d, removed: false } : d));
+
+        // Notify parent with current server-backed docs (exclude temp negative IDs)
         if (typeof onDocumentsUpdated === "function") {
-          onDocumentsUpdated(fresh || []);
+          onDocumentsUpdated(afterDeletes.filter((d) => d.documentId > 0).map((d) => ({ ...d })));
         }
-      } catch (err) {
-        console.error("Failed to reload documents after update:", err);
+
+        return afterDeletes;
+      });
+
+
+type AddError = {
+  doc: (typeof toAdd)[number];
+  err: unknown;
+};
+
+
+      // Then, add new documents one by one so we can replace temp docs with server-created docs
+      const addErrors: AddError[] = [];
+      for (const newDoc of toAdd) {
+        try {
+          const created = await applicationsService.addApplicantDocument({ applicant: { applicantId }, documentType: newDoc.documentType, content: newDoc.content });
+
+          // Replace the temp doc with the created doc in state and notify parent
+          setDocs((prev) => {
+            const updated = prev.map((d) => (d.documentId === newDoc.documentId ? { ...created } : d));
+            if (typeof onDocumentsUpdated === "function") {
+              onDocumentsUpdated(updated.filter((d) => d.documentId > 0).map((d) => ({ ...d })));
+            }
+            return updated;
+          });
+        } catch (err) {
+          console.error("Failed to add document:", err);
+          addErrors.push({ doc: newDoc, err });
+        }
       }
+
+      if (addErrors.length > 0) {
+        toast.warn("Some document uploads failed. Check console for details.");
+      }
+
+      // Build current documents list (exclude any removed flags)
+      setDocs((prev) => {
+        const current = prev.filter((d) => !d.removed).map((d) => ({ ...d }));
+        if (typeof onDocumentsUpdated === "function") {
+          onDocumentsUpdated(current.filter((d) => d.documentId > 0).map((d) => ({ ...d })));
+        }
+        return current;
+      });
 
       toast.success("Documents updated successfully");
 
