@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Bell, Moon, Sun, Lock, Shield, Eye, EyeOff, Save } from "lucide-react"
+import SearchableSelect from "@/app/components/common/SearchableSelect"
 
 export default function AccountSettingsPage() {
   const [activeTab, setActiveTab] = useState("preferences")
@@ -12,6 +13,10 @@ export default function AccountSettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const [language, setLanguage] = useState<string | null>("en")
+  const [timezone, setTimezone] = useState<string | null>("Africa/Nairobi")
+  const [dateFormat, setDateFormat] = useState<string | null>("YYYY-MM-DD")
 
   return (
     <div className="space-y-6">
@@ -84,32 +89,50 @@ export default function AccountSettingsPage() {
 
                     <div className="p-4 bg-backgroundsecondary rounded-md">
                       <h3 className="font-medium mb-3">Language</h3>
-                      <select className="input-field">
-                        <option value="en">English</option>
-                        <option value="fr">French</option>
-                        <option value="es">Spanish</option>
-                        <option value="sw">Swahili</option>
-                      </select>
+                      <SearchableSelect
+                        options={[
+                          { value: "en", label: "English" },
+                          { value: "fr", label: "French" },
+                          { value: "es", label: "Spanish" },
+                          { value: "sw", label: "Swahili" },
+                        ]}
+                        value={language}
+                        onChange={(v: string | number | null) => setLanguage(v?.toString() ?? null)}
+                        placeholder="Select Language"
+                        className="w-full"
+                      />
                     </div>
 
                     <div className="p-4 bg-backgroundsecondary rounded-md">
                       <h3 className="font-medium mb-3">Time Zone</h3>
-                      <select className="input-field">
-                        <option value="Africa/Nairobi">Africa/Nairobi (EAT)</option>
-                        <option value="UTC">UTC</option>
-                        <option value="America/New_York">America/New_York (EST)</option>
-                        <option value="Europe/London">Europe/London (GMT)</option>
-                      </select>
+                      <SearchableSelect
+                        options={[
+                          { value: "Africa/Nairobi", label: "Africa/Nairobi (EAT)" },
+                          { value: "UTC", label: "UTC" },
+                          { value: "America/New_York", label: "America/New_York (EST)" },
+                          { value: "Europe/London", label: "Europe/London (GMT)" },
+                        ]}
+                        value={timezone}
+                        onChange={(v: string | number | null) => setTimezone(v?.toString() ?? null)}
+                        placeholder="Select Timezone"
+                        className="w-full"
+                      />
                     </div>
 
                     <div className="p-4 bg-backgroundsecondary rounded-md">
                       <h3 className="font-medium mb-3">Date Format</h3>
-                      <select className="input-field">
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                        <option value="DD-MMM-YYYY">DD-MMM-YYYY</option>
-                      </select>
+                      <SearchableSelect
+                        options={[
+                          { value: "YYYY-MM-DD", label: "YYYY-MM-DD" },
+                          { value: "DD/MM/YYYY", label: "DD/MM/YYYY" },
+                          { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
+                          { value: "DD-MMM-YYYY", label: "DD-MMM-YYYY" },
+                        ]}
+                        value={dateFormat}
+                        onChange={(v: string | number | null) => setDateFormat(v?.toString() ?? null)}
+                        placeholder="Select Date Format"
+                        className="w-full"
+                      />
                     </div>
                   </div>
 

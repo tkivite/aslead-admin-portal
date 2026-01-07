@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
+import SearchableSelect from "@/app/components/common/SearchableSelect";
 import { toast } from "react-toastify";
 import { examTypesService } from "@/services/exam-types.api";
 import { courseUnitsService } from "@/services/course-units.api";
@@ -133,15 +134,13 @@ export default function ExamModal({ isOpen, onClose, onSuccess, courseUnitId, in
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Exam Type *</label>
-                  <select
-                    value={form.examType.examTypeId}
-                    onChange={(e) => handleChange("examType", { examTypeId: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    {examTypes.map((t) => (
-                      <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={examTypes.map((t) => ({ value: t.examTypeId, label: t.name }))}
+                    value={form.examType?.examTypeId ?? null}
+                    onChange={(v: string | number | null) => handleChange("examType", { examTypeId: Number(v) })}
+                    placeholder="Select Type"
+                    className="w-full"
+                  />
                 </div>
 
                 <div>
@@ -186,32 +185,36 @@ export default function ExamModal({ isOpen, onClose, onSuccess, courseUnitId, in
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year *</label>
-                  <select
-                    value={form.academicYear}
-                    onChange={(e) => handleChange("academicYear", parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value={1}>Year 1</option>
-                    <option value={2}>Year 2</option>
-                    <option value={3}>Year 3</option>
-                    <option value={4}>Year 4</option>
-                    <option value={5}>Year 5</option>
-                    <option value={6}>Year 6</option>
-                  </select>
+                  <SearchableSelect
+                    options={[
+                      { value: 1, label: "Year 1" },
+                      { value: 2, label: "Year 2" },
+                      { value: 3, label: "Year 3" },
+                      { value: 4, label: "Year 4" },
+                      { value: 5, label: "Year 5" },
+                      { value: 6, label: "Year 6" },
+                    ]}
+                    value={form.academicYear ?? null}
+                    onChange={(v: string | number | null) => handleChange("academicYear", Number(v))}
+                    placeholder="Select Year"
+                    className="w-full"
+                  />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Session *</label>
-                  <select
-                    value={form.session}
-                    onChange={(e) => handleChange("session", parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value={1}>Session 1</option>
-                    <option value={2}>Session 2</option>
-                    <option value={3}>Session 3</option>
-                    <option value={4}>Session 4</option>
-                  </select>
+                  <SearchableSelect
+                    options={[
+                      { value: 1, label: "Session 1" },
+                      { value: 2, label: "Session 2" },
+                      { value: 3, label: "Session 3" },
+                      { value: 4, label: "Session 4" },
+                    ]}
+                    value={form.session ?? null}
+                    onChange={(v: string | number | null) => handleChange("session", Number(v))}
+                    placeholder="Select Session"
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="md:col-span-2">

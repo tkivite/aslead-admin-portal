@@ -5,9 +5,16 @@ import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Save, MessageSquare, Mail, Globe, Shield } from "lucide-react"
+import SearchableSelect from "@/app/components/common/SearchableSelect"
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general")
+  // Local state for selects
+  const [timezone, setTimezone] = useState<string | null>("Africa/Nairobi")
+  const [dateFormat, setDateFormat] = useState<string | null>("YYYY-MM-DD")
+  const [smsProvider, setSmsProvider] = useState<string | null>("africastalking")
+  const [encryption, setEncryption] = useState<string | null>("tls")
+  const [twoFactor, setTwoFactor] = useState<string | null>("disabled")
 
   // Function to handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -98,21 +105,33 @@ export default function SettingsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-textDark mb-1">Timezone</label>
-                      <select className="input-field">
-                        <option value="Africa/Nairobi">Africa/Nairobi (EAT)</option>
-                        <option value="UTC">UTC</option>
-                        <option value="America/New_York">America/New_York (EST)</option>
-                        <option value="Europe/London">Europe/London (GMT)</option>
-                      </select>
+                      <SearchableSelect
+                        options={[
+                          { value: "Africa/Nairobi", label: "Africa/Nairobi (EAT)" },
+                          { value: "UTC", label: "UTC" },
+                          { value: "America/New_York", label: "America/New_York (EST)" },
+                          { value: "Europe/London", label: "Europe/London (GMT)" },
+                        ]}
+                        value={timezone}
+                        onChange={(v: string | number | null) => setTimezone(v?.toString() ?? null)}
+                        placeholder="Select timezone"
+                        className="w-full"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-textDark mb-1">Date Format</label>
-                      <select className="input-field">
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                        <option value="DD-MMM-YYYY">DD-MMM-YYYY</option>
-                      </select>
+                      <SearchableSelect
+                        options={[
+                          { value: "YYYY-MM-DD", label: "YYYY-MM-DD" },
+                          { value: "DD/MM/YYYY", label: "DD/MM/YYYY" },
+                          { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
+                          { value: "DD-MMM-YYYY", label: "DD-MMM-YYYY" },
+                        ]}
+                        value={dateFormat}
+                        onChange={(v: string | number | null) => setDateFormat(v?.toString() ?? null)}
+                        placeholder="Select date format"
+                        className="w-full"
+                      />
                     </div>
                     <div className="pt-4">
                       <button type="submit" className="btn-tertiary flex items-center">
@@ -137,11 +156,17 @@ export default function SettingsPage() {
                   <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
                       <label className="block text-sm font-medium text-textDark mb-1">SMS Provider</label>
-                      <select className="input-field">
-                        <option value="africastalking">Africa&apos;s Talking</option>
-                        <option value="twilio">Twilio</option>
-                        <option value="infobip">Infobip</option>
-                      </select>
+                      <SearchableSelect
+                        options={[
+                          { value: "africastalking", label: "Africa's Talking" },
+                          { value: "twilio", label: "Twilio" },
+                          { value: "infobip", label: "Infobip" },
+                        ]}
+                        value={smsProvider}
+                        onChange={(v: string | number | null) => setSmsProvider(v?.toString() ?? null)}
+                        placeholder="Select provider"
+                        className="w-full"
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-textDark mb-1">API Key</label>
@@ -199,11 +224,17 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-textDark mb-1">Encryption</label>
-                        <select className="input-field">
-                          <option value="tls">TLS</option>
-                          <option value="ssl">SSL</option>
-                          <option value="none">None</option>
-                        </select>
+                        <SearchableSelect
+                          options={[
+                            { value: "tls", label: "TLS" },
+                            { value: "ssl", label: "SSL" },
+                            { value: "none", label: "None" },
+                          ]}
+                          value={encryption}
+                          onChange={(v: string | number | null) => setEncryption(v?.toString() ?? null)}
+                          placeholder="Select encryption"
+                          className="w-full"
+                        />
                       </div>
                     </div>
                     <div>
@@ -304,12 +335,18 @@ export default function SettingsPage() {
                     <div>
                       <label className="block text-sm font-medium text-textDark mb-1">Two-Factor Authentication</label>
                       <div className="flex items-center">
-                        <select className="input-field">
-                          <option value="disabled">Disabled</option>
-                          <option value="optional">Optional for users</option>
-                          <option value="required">Required for all users</option>
-                          <option value="admin-only">Required for admin users only</option>
-                        </select>
+                        <SearchableSelect
+                          options={[
+                            { value: "disabled", label: "Disabled" },
+                            { value: "optional", label: "Optional for users" },
+                            { value: "required", label: "Required for all users" },
+                            { value: "admin-only", label: "Required for admin users only" },
+                          ]}
+                          value={twoFactor}
+                          onChange={(v: string | number | null) => setTwoFactor(v?.toString() ?? null)}
+                          placeholder="Select 2FA"
+                          className="w-full"
+                        />
                       </div>
                     </div>
                     <div className="pt-4">
