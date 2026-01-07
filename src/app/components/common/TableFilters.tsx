@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Filter, Calendar, Search, ChevronDown } from "lucide-react";
+import SearchableSelect from "./SearchableSelect";
 
 export interface FilterOptions {
   search?: string;
@@ -220,18 +221,14 @@ export default function TableFilters({
               {showStatusFilter && statusOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Status</label>
-                  <select
-                    value={tempFilters.status || ""}
-                    onChange={(e) => handleFilterChange("status", e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
-                  >
-                    <option value="">All Statuses</option>
-                    {statusOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "", label: "All Statuses" }, ...statusOptions.map((o) => ({ value: o.value, label: o.label }))]}
+                    value={tempFilters.status ?? ""}
+                    onChange={(v) => handleFilterChange("status", (v as string) || undefined)}
+                    placeholder="All Statuses"
+                    className="w-full"
+                    searchable={true}
+                  />
                 </div>
               )}
 
@@ -239,18 +236,14 @@ export default function TableFilters({
               {showEnrollmentStatusFilter && enrollmentStatusOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Enrollment Status</label>
-                  <select
-                    value={tempFilters.enrollmentStatus || ""}
-                    onChange={(e) => handleFilterChange("enrollmentStatus", e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
-                  >
-                    <option value="">All Statuses</option>
-                    {enrollmentStatusOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "", label: "All Statuses" }, ...enrollmentStatusOptions.map((o) => ({ value: o.value, label: o.label }))]}
+                    value={tempFilters.enrollmentStatus ?? ""}
+                    onChange={(v) => handleFilterChange("enrollmentStatus", (v as string) || undefined)}
+                    placeholder="All Statuses"
+                    className="w-full"
+                    searchable={true}
+                  />
                 </div>
               )}
 
@@ -258,18 +251,14 @@ export default function TableFilters({
               {showCampusFilter && campusOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Campus</label>
-                  <select
-                    value={tempFilters.campusId || ""}
-                    onChange={(e) => handleFilterChange("campusId", e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
-                  >
-                    <option value="">All Campuses</option>
-                    {campusOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "", label: "All Campuses" }, ...campusOptions.map((o) => ({ value: o.value, label: o.label }))]}
+                    value={tempFilters.campusId ?? ""}
+                    onChange={(v) => handleFilterChange("campusId", v === "" ? undefined : Number(v))}
+                    placeholder="All Campuses"
+                    className="w-full"
+                    searchable={true}
+                  />
                 </div>
               )}
 
@@ -277,18 +266,14 @@ export default function TableFilters({
               {showProgramFilter && programOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Program</label>
-                  <select
-                    value={tempFilters.programId || ""}
-                    onChange={(e) => handleFilterChange("programId", e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
-                  >
-                    <option value="">All Programs</option>
-                    {programOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "", label: "All Programs" }, ...programOptions.map((o) => ({ value: o.value, label: o.label }))]}
+                    value={tempFilters.programId ?? ""}
+                    onChange={(v) => handleFilterChange("programId", v === "" ? undefined : Number(v))}
+                    placeholder="All Programs"
+                    className="w-full"
+                    searchable={true}
+                  />
                 </div>
               )}
 
@@ -296,18 +281,14 @@ export default function TableFilters({
               {showCountryFilter && countryOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Country</label>
-                  <select
-                    value={tempFilters.country || ""}
-                    onChange={(e) => handleFilterChange("country", e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
-                  >
-                    <option value="">All Countries</option>
-                    {countryOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "", label: "All Countries" }, ...countryOptions.map((o) => ({ value: o.value, label: o.label }))]}
+                    value={tempFilters.country ?? ""}
+                    onChange={(v) => handleFilterChange("country", (v as string) || undefined)}
+                    placeholder="All Countries"
+                    className="w-full"
+                    searchable={true}
+                  />
                 </div>
               )}
 
@@ -315,18 +296,14 @@ export default function TableFilters({
               {showCountyFilter && countyOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">County</label>
-                  <select
-                    value={tempFilters.county || ""}
-                    onChange={(e) => handleFilterChange("county", e.target.value || undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
-                  >
-                    <option value="">All Counties</option>
-                    {countyOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "", label: "All Counties" }, ...countyOptions.map((o) => ({ value: o.value, label: o.label }))]}
+                    value={tempFilters.county ?? ""}
+                    onChange={(v) => handleFilterChange("county", (v as string) || undefined)}
+                    placeholder="All Counties"
+                    className="w-full"
+                    searchable={true}
+                  />
                 </div>
               )}
 

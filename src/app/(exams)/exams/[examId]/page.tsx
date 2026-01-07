@@ -5,10 +5,9 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Edit3, Loader2, Calendar, BookOpen, Target, Award } from "lucide-react"
 import { toast } from "react-toastify"
 import { courseUnitsService } from "@/services/course-units.api"
-import { examsService } from "@/services/exams.api"
-import DataTable from "@/app/components/common/DataTable"
-import ExamModal from "@/app/programs/components/exam-modal"
-import type { Exam, ExamMark } from "@/types/exams.types"
+
+import ExamModal from "@/app/(administration)/programs/components/exam-modal"
+import type { Exam } from "@/types/exams.types"
 
 export default function ExamDetailPage() {
   const params = useParams()
@@ -21,13 +20,8 @@ export default function ExamDetailPage() {
   const [exam, setExam] = useState<Exam | null>(null)
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<"info" | "performance">("info")
+ 
 
-  // Performance tab state
-  const [stats, setStats] = useState<{ averageMarks?: number; highestMarks?: number; lowestMarks?: number } | null>(null)
-  const [marksData, setMarksData] = useState<{ content: ExamMark[]; totalPages: number; totalElements: number }>({ content: [], totalPages: 1, totalElements: 0 })
-  const [marksPage, setMarksPage] = useState(0)
-  const [marksLoading, setMarksLoading] = useState(false)
 
   const fetchExam = React.useCallback(async () => {
     if (!courseUnitId || !examId) {
@@ -57,42 +51,6 @@ export default function ExamDetailPage() {
     fetchExam()
   }, [])
 
-  // Fetch exam statistics
-  const fetchStats = React.useCallback(async () => {
-    if (!examId) return
-    try {
-      const data = await examsService.getStatistics(examId)
-      setStats(data)
-    } catch (err) {
-      console.error(err)
-      toast.error("Failed to load exam statistics")
-    }
-  }, [examId])
-
-  // Fetch marks (paginated)
-  const fetchMarks = React.useCallback(
-    async (page = 0) => {
-      if (!examId) return
-      try {
-        setMarksLoading(true)
-        const data = await examsService.getMarks(examId, page, 10)
-        setMarksData(data)
-      } catch (err) {
-        console.error(err)
-        toast.error("Failed to load marks")
-      } finally {
-        setMarksLoading(false)
-      }
-    },
-    [examId],
-  )
-
-  useEffect(() => {
-    if (activeTab === "performance") {
-      fetchStats()
-      fetchMarks(marksPage)
-    }
-  }, [activeTab, fetchStats, fetchMarks, marksPage])
 
   const handleEditSuccess = async () => {
     setIsModalOpen(false)
@@ -140,26 +98,10 @@ export default function ExamDetailPage() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setActiveTab("info")}
-              className={`px-4 py-2 rounded-lg ${activeTab === "info" ? "bg-white shadow-sm" : "bg-transparent text-gray-600"}`}
-            >
-              Exam Info
-            </button>
-            <button
-              onClick={() => setActiveTab("performance")}
-              className={`px-4 py-2 rounded-lg ${activeTab === "performance" ? "bg-white shadow-sm" : "bg-transparent text-gray-600"}`}
-            >
-              Performance
-            </button>
-          </div>
-        </div>
+     
         {/* Tab Content */}
         <div>
-          {activeTab === "info" ? (
+        
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Main Details */}
               <div className="lg:col-span-2 space-y-6">
@@ -340,64 +282,7 @@ export default function ExamDetailPage() {
                 </div>
               </div>
             </div>
-          ) : (
-            // Performance tab
-            <div className="grid grid-cols-1 gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <p className="text-sm text-gray-600">Average Marks</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats?.averageMarks ?? "-"}</p>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <p className="text-sm text-gray-600">Highest Marks</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats?.highestMarks ?? "-"}</p>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <p className="text-sm text-gray-600">Lowest Marks</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats?.lowestMarks ?? "-"}</p>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Student Marks</h3>
-                </div>
-
-                <DataTable
-                  loading={marksLoading}
-                  data={marksData.content || []}
-                  searchable={false}
-                  pagination={{
-                    currentPage: marksPage,
-                    totalPages: marksData.totalPages || 1,
-                    totalElements: marksData.totalElements || 0,
-                    onPageChange: (p: number) => setMarksPage(p),
-                  }}
-                  columns={[
-                    {
-                      key: "student",
-                      label: "Student",
-                      render: (item: ExamMark) => {
-                        const applicant = item.student?.applicant || item.student?.application?.applicant
-                        if (applicant) return `${applicant.firstName} ${applicant.lastName}`
-                        return item.student?.enrollmentNumber || item.student?.admissionNumber || "-"
-                      },
-                    },
-                    { key: "marksObtained", label: "Marks", render: (item: ExamMark) => item.marksObtained },
-                    { key: "grade", label: "Grade" },
-                    { key: "remarks", label: "Remarks" },
-                    { key: "markedBy", label: "Marked By" },
-                    {
-                      key: "markedAt",
-                      label: "Marked At",
-                      render: (item: ExamMark) => (item.markedAt ? new Date(item.markedAt).toLocaleString() : "-"),
-                    },
-                  ]}
-                 
-                />
-              </div>
-            </div>
-          )}
+        
         </div>
       </div>
 

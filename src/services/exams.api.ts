@@ -22,4 +22,10 @@ export const examsService = {
     );
     return response.data.body;
   },
+
+  // Add a mark to an exam
+  addMark: async (examId: number, payload: { student: { studentId: number }; marksObtained: number; remarks?: string; markedBy?: string }) => {
+    const response = await api.post<ApiResponse<any>>(`/application/api/exams/${examId}/marks`, payload);
+    return response.data.body;
+  },
 };
