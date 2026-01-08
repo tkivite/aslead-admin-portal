@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import SearchableSelect from "@/app/components/common/SearchableSelect";
 
 import type {  Campus } from "@/types/students.types";
 import type { Program } from "@/types/programs.types";
@@ -168,16 +169,13 @@ export default function EditApplicationForm({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Gender
                 </label>
-                <select
-                  value={formData.gender}
-                  onChange={(e) => handleInputChange("gender", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
+                <SearchableSelect
+                  options={[{ value: "", label: "Select Gender" }, { value: "Male", label: "Male" }, { value: "Female", label: "Female" }, { value: "Other", label: "Other" }]}
+                  value={formData.gender || null}
+                  onChange={(v: string | number | null) => handleInputChange("gender", v?.toString() ?? "") }
+                  placeholder="Select Gender"
+                  className="w-full"
+                />
               </div>
 
               <div>
@@ -197,33 +195,32 @@ export default function EditApplicationForm({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Current Education Level *
                 </label>
-                <select
-                  required
-                  value={formData.currentEducationLevel}
-                  onChange={(e) => handleInputChange("currentEducationLevel", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="High School">High School</option>
-                  <option value="Diploma">Diploma</option>
-                  <option value="Bachelor&apos;s">Bachelor&apos;s</option>
-                  <option value="Master&apos;s">Master&apos;s</option>
-                  <option value="PhD">PhD</option>
-                </select>
+                <SearchableSelect
+                  options={[
+                    { value: "High School", label: "High School" },
+                    { value: "Diploma", label: "Diploma" },
+                    { value: "Bachelor's", label: "Bachelor's" },
+                    { value: "Master's", label: "Master's" },
+                    { value: "PhD", label: "PhD" },
+                  ]}
+                  value={formData.currentEducationLevel || null}
+                  onChange={(v: string | number | null) => handleInputChange("currentEducationLevel", v?.toString() ?? "") }
+                  placeholder="Select Education Level"
+                  className="w-full"
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Identity Type
                 </label>
-                <select
-                  value={formData.identityType}
-                  onChange={(e) => handleInputChange("identityType", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="NationalId">National ID</option>
-                  <option value="Passport">Passport</option>
-                  <option value="DrivingLicense">Driving License</option>
-                </select>
+                <SearchableSelect
+                  options={[{ value: "NationalId", label: "National ID" }, { value: "Passport", label: "Passport" }, { value: "DrivingLicense", label: "Driving License" }]}
+                  value={formData.identityType || null}
+                  onChange={(v: string | number | null) => handleInputChange("identityType", v?.toString() ?? "") }
+                  placeholder="Select Identity Type"
+                  className="w-full"
+                />
               </div>
 
               <div>
@@ -257,38 +254,26 @@ export default function EditApplicationForm({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Program *
                 </label>
-                <select
-                  required
-                  value={formData.programId}
-                  onChange={(e) => handleInputChange("programId", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="">Select Program</option>
-                  {programs.map((program) => (
-                    <option key={program.programId} value={program.programId}>
-                      {program.name} - {program.code}
-                    </option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  options={[{ value: "", label: "Select Program" }, ...programs.map((p) => ({ value: p.programId.toString(), label: `${p.name} - ${p.code}` }))]}
+                  value={formData.programId || null}
+                  onChange={(v: string | number | null) => handleInputChange("programId", v?.toString() ?? "") }
+                  className="w-full"
+                  placeholder="Select Program"
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Campus *
                 </label>
-                <select
-                  required
-                  value={formData.campusId}
-                  onChange={(e) => handleInputChange("campusId", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="">Select Campus</option>
-                  {campuses.map((campus) => (
-                    <option key={campus.id} value={campus.id}>
-                      {campus.name} - {campus.location}
-                    </option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  options={[{ value: "", label: "Select Campus" }, ...campuses.map((c) => ({ value: c.id.toString(), label: `${c.name} - ${c.location}` }))]}
+                  value={formData.campusId || null}
+                  onChange={(v: string | number | null) => handleInputChange("campusId", v?.toString() ?? "") }
+                  className="w-full"
+                  placeholder="Select Campus"
+                />
               </div>
 
               <div className="md:col-span-2">

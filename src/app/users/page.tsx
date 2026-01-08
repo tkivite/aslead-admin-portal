@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Plus, Search, Edit, Trash, Shield, Mail, Phone, Eye, EyeOff } from "lucide-react"
+import SearchableSelect from "@/app/components/common/SearchableSelect"
 
 // Mock data for users
 const usersData = [
@@ -331,27 +332,30 @@ export default function UsersPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-textDark mb-1">Role</label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                    className="input-field"
-                    required
-                  >
-                    <option value="">Select Role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Instructor">Instructor</option>
-                  </select>
+                  <SearchableSelect
+                    options={[
+                      { value: "", label: "Select Role" },
+                      { value: "Admin", label: "Admin" },
+                      { value: "Finance", label: "Finance" },
+                      { value: "Manager", label: "Manager" },
+                      { value: "Staff", label: "Staff" },
+                      { value: "Instructor", label: "Instructor" },
+                    ]}
+                    value={formData.role || null}
+                    onChange={(v: string | number | null) => setFormData({ ...formData, role: v?.toString() ?? "" })}
+                    className="w-full"
+                    placeholder="Select Role"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-textDark mb-1">Status</label>
-                  <select name="status" value={formData.status} onChange={handleInputChange} className="input-field">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
+                  <SearchableSelect
+                    options={[{ value: "Active", label: "Active" }, { value: "Inactive", label: "Inactive" }]}
+                    value={formData.status || null}
+                    onChange={(v: string | number | null) => setFormData({ ...formData, status: v?.toString() ?? "" })}
+                    className="w-full"
+                    placeholder="Select Status"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-textDark mb-1">Password</label>

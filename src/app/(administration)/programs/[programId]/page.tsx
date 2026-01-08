@@ -7,6 +7,7 @@ import { ArrowLeft, Edit3, X, Check, Clock, DollarSign, Users, Plus, BookOpen, L
 import { toast } from "react-toastify";
 import { programsService } from "@/services/programs.api";
 import { courseUnitsService } from "@/services/course-units.api";
+import SearchableSelect from "@/app/components/common/SearchableSelect";
 import type { Program, UpdateProgramData } from "@/types/programs.types";
 import type { CourseUnit, CourseUnitCreateRequest } from "@/types/courses.types";
 
@@ -664,49 +665,49 @@ export default function ProgramDetailPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Academic Year *
                   </label>
-                  <select
-                    value={unitForm.academicYear}
-                    onChange={(e) => handleUnitInputChange("academicYear", parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    required
-                  >
-                    <option value={1}>Year 1</option>
-                    <option value={2}>Year 2</option>
-                    <option value={3}>Year 3</option>
-                    <option value={4}>Year 4</option>
-                    <option value={5}>Year 5</option>
-                    <option value={6}>Year 6</option>
-                  </select>
+                  <SearchableSelect
+                    options={[
+                      { value: 1, label: "Year 1" },
+                      { value: 2, label: "Year 2" },
+                      { value: 3, label: "Year 3" },
+                      { value: 4, label: "Year 4" },
+                      { value: 5, label: "Year 5" },
+                      { value: 6, label: "Year 6" },
+                    ]}
+                    value={unitForm.academicYear ?? null}
+                    onChange={(v: string | number | null) => handleUnitInputChange("academicYear", Number(v))}
+                    placeholder="Select Year"
+                    className="w-full"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Session *
                   </label>
-                  <select
-                    value={unitForm.session}
-                    onChange={(e) => handleUnitInputChange("session", parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    required
-                  >
-                    <option value={1}>Session 1</option>
-                    <option value={2}>Session 2</option>
-                    <option value={3}>Session 3</option>
-                    <option value={4}>Session 4</option>
-                  </select>
+                  <SearchableSelect
+                    options={[
+                      { value: 1, label: "Session 1" },
+                      { value: 2, label: "Session 2" },
+                      { value: 3, label: "Session 3" },
+                      { value: 4, label: "Session 4" },
+                    ]}
+                    value={unitForm.session ?? null}
+                    onChange={(v: string | number | null) => handleUnitInputChange("session", Number(v))}
+                    placeholder="Select Session"
+                    className="w-full"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Compulsory *
                   </label>
-                  <select
+                  <SearchableSelect
+                    options={[{ value: "true", label: "Compulsory" }, { value: "false", label: "Optional" }]}
                     value={unitForm.compuslory ? "true" : "false"}
-                    onChange={(e) => handleUnitInputChange("compuslory", e.target.value === "true")}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    required
-                  >
-                    <option value="true">Compulsory</option>
-                    <option value="false">Optional</option>
-                  </select>
+                    onChange={(v: string | number | null) => handleUnitInputChange("compuslory", (v === "true"))}
+                    className="w-full"
+                    placeholder="Select"
+                  />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">

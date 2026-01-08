@@ -15,7 +15,12 @@ import {
   X,
   BookOpen,
   MapPin,
-  FileCheckIcon
+  FileCheckIcon,
+   ClipboardCheck,
+  BarChart3,
+  Tags,
+  Percent,
+  LucideBuilding2
 } from "lucide-react";
 import { useAppSelector } from "@/lib/hooks";
 
@@ -108,7 +113,7 @@ export default function MobileSidebar({ isOpen, onClose, userRole = "admin" }: M
     {
       name: "Administration",
       path: "#",
-      icon: FileCheckIcon,
+      icon: LucideBuilding2,
       key: "administration",
       submenu: [
           {
@@ -135,19 +140,25 @@ export default function MobileSidebar({ isOpen, onClose, userRole = "admin" }: M
         {
           name: "Exams",
           path: "/exams",
-          icon: FileCheckIcon,
+          icon: ClipboardCheck,
           key: "exams",
+        },
+        {
+          name: "Performance",
+          path: "/performance",
+          icon: BarChart3,
+          key: "performance",
         },
         {
           name: "Exam Types",
           path: "/exam-types",
-          icon: BookOpen,
+          icon: Tags,
           key: "exam-types",
         },
         {
           name: "Grading System",
           path: "/grading-systems",
-          icon: BookOpen,
+          icon: Percent,
           key: "grading-systems",
         },
       ],

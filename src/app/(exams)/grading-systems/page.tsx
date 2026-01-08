@@ -5,7 +5,7 @@ import { Plus, Loader2, Edit3 } from "lucide-react";
 import { toast } from "react-toastify";
 import { gradingSystemService } from "@/services/grading-system.api";
 import DataTable from "@/app/components/common/DataTable";
-import GradingSystemModal from "@/app/exams/components/grading-system-modal";
+import GradingSystemModal from "@/app/(exams)/exams/components/grading-system-modal";
 import type { GradingSystem } from "@/types/grading.types";
 
 export default function GradingSystemsPage() {

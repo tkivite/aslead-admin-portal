@@ -5,7 +5,7 @@ import { Plus, Loader2, Edit3 } from "lucide-react";
 import { toast } from "react-toastify";
 import { examTypesService } from "@/services/exam-types.api";
 import DataTable from "@/app/components/common/DataTable";
-import ExamTypeModal from "@/app/exams/components/exam-type-modal";
+import ExamTypeModal from "@/app/(exams)/exams/components/exam-type-modal";
 import type { ExamType } from "@/types/exams.types";
 
 export default function ExamTypesPage() {

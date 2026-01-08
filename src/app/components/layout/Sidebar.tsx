@@ -22,7 +22,13 @@ import {
   Smartphone,
   BookOpen,
   MapPin,
-  FileCheckIcon
+  FileCheckIcon,
+   ClipboardCheck,
+  BarChart3,
+  Tags,
+  Percent,
+
+  LucideBuilding2
 } from "lucide-react"
 import { useAppSelector } from "@/lib/hooks"
 
@@ -48,6 +54,7 @@ const rolePermissions = {
     "programs",
     "campuses",
     "exams",
+    "performance",
     "exam-types",
     "grading-systems",
   ],
@@ -128,7 +135,7 @@ const menuItems: MenuItem[] = [
   {
     name: "Administration",
     path: "#",
-    icon: FileCheckIcon,
+    icon: LucideBuilding2,
     key: "administration",
     submenu: [
         {
@@ -153,25 +160,31 @@ const menuItems: MenuItem[] = [
     icon: FileCheckIcon,
     key: "exams",
     submenu: [
-      {
-        name: "Exams",
-        path: "/exams",
-        icon: FileCheckIcon,
-        key: "exams",
-      },
-      {
-        name: "Exam Types",
-        path: "/exam-types",
-        icon: BookOpen,
-        key: "exam-types",
-      },
-      {
-        name: "Grading System",
-        path: "/grading-systems",
-        icon: BookOpen,
-        key: "grading-systems",
-      },
-    ],
+        {
+          name: "Exams",
+          path: "/exams",
+          icon: ClipboardCheck,
+          key: "exams",
+        },
+        {
+          name: "Performance",
+          path: "/performance",
+          icon: BarChart3,
+          key: "performance",
+        },
+        {
+          name: "Exam Types",
+          path: "/exam-types",
+          icon: Tags,
+          key: "exam-types",
+        },
+        {
+          name: "Grading System",
+          path: "/grading-systems",
+          icon: Percent,
+          key: "grading-systems",
+        },
+      ],
   },
  /*  {
     name: "Courses",

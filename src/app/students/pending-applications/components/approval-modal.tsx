@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, GraduationCap, Check } from "lucide-react";
+import SearchableSelect from "@/app/components/common/SearchableSelect";
 import type { Application } from "@/types/applications.types";
 
 interface ApprovalModalProps {
@@ -140,19 +141,13 @@ export default function ApprovalModal({
                 <label className="block text-sm font-medium text-textDark mb-2">
                   Start Month
                 </label>
-                <select
-                  value={startMonth}
-                  onChange={(e) => setStartMonth(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-transparent transition-colors"
-                  required
-                  disabled={isSubmitting}
-                >
-                  {MONTHS.map((month) => (
-                    <option key={month} value={month}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
+                <SearchableSelect
+                  options={MONTHS.map((m) => ({ value: m, label: m }))}
+                  value={startMonth || null}
+                  onChange={(v: string | number | null) => setStartMonth(v?.toString() ?? "")}
+                  placeholder="Select Month"
+                  className="w-full"
+                />
               </div>
 
               {/* Action Buttons */}
