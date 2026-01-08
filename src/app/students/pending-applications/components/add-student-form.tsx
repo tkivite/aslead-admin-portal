@@ -157,14 +157,13 @@ export default function AddStudentForm({
         {/* Middle Name */}
         <div className="space-y-2">
           <label htmlFor="middleName" className="block text-sm font-medium text-gray-700">
-            Middle Name <span className="text-red-500">*</span>
+            Middle Name 
           </label>
           <input
             id="middleName"
             name="middleName"
             type="text"
             value={formData.middleName}
-            required
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
