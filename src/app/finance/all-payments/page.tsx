@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Clock, Receipt, Smartphone } from "lucide-react"
 import DataTable from "@/app/components/common/DataTable"
@@ -15,7 +15,11 @@ export default function AllPaymentsPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
 
-  const fetchPayments = React.useCallback(async () => {
+  useEffect(() => {
+    fetchPayments()
+  }, [currentPage])
+
+  const fetchPayments = async () => {
     try {
       setLoading(true)
       const response = await paymentsService.getPaginatedPayments(currentPage, 10)
@@ -27,11 +31,7 @@ export default function AllPaymentsPage() {
     } finally {
       setLoading(false)
     }
-  }, [currentPage])
-
-  useEffect(() => {
-    fetchPayments()
-  }, [])
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
