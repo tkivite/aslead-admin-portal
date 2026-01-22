@@ -127,10 +127,25 @@ export default function ProgramsPage() {
                   <span>{program.durationMonths} months</span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <DollarSign className="w-4 h-4" />
-                  <span>{formatCurrency(program.tuitionFee)}</span>
-                </div>
+                {(() => {
+                  const tuitionCost = program.costs?.find((c) => c.description === "Tution fees");
+                  const kesAmount = tuitionCost ? tuitionCost.amountInKES : program.tuitionFee;
+                  const usdAmount = tuitionCost?.amountInUSD;
+
+                  return (
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <DollarSign className="w-4 h-4" />
+                        <span>{formatCurrency(kesAmount)}</span>
+                      </div>
+                      {usdAmount && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 ml-6">
+                          <span>USD {usdAmount}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
 
                 {program.contacts && (

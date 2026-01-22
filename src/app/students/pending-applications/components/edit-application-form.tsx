@@ -60,7 +60,7 @@ export default function EditApplicationForm({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-h-[80vh] overflow-y-auto p-1">
       {/* Progress Steps */}
       <div className="flex items-center justify-between mb-8">
         {steps.map((step, index) => (

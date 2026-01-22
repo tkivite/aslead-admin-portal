@@ -28,9 +28,12 @@ export interface Program {
   updatedAt: string;
   contacts: string;
   costs?: Array<{
-    id: number;
+    costId: number;
     description: string;
-    amount: number;
+    amountInKES: number;
+    amountInUSD: number | null;
+    createdAt: string;
+    updatedAt: string;
   }>;
 }
 
