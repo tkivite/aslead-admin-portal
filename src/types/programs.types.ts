@@ -1,7 +1,8 @@
 export interface ProgramCost {
   costId: number;
   description: string;
-  amount: number;
+  amountInKES: number;
+  amountInUSD: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,14 +28,7 @@ export interface Program {
   createdAt: string;
   updatedAt: string;
   contacts: string;
-  costs?: Array<{
-    costId: number;
-    description: string;
-    amountInKES: number;
-    amountInUSD: number | null;
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  costs?: ProgramCost[];
 }
 
 export interface ProgramPageResponse {
