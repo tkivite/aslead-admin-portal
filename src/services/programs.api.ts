@@ -1,12 +1,18 @@
 import api from "./api";
 import type { ApiResponse } from "@/types/api.types";
-import type { Program, ProgramPageResponse, CreateProgramData, UpdateProgramData } from "@/types/programs.types";
+import type {
+  Program,
+  ProgramPageResponse,
+  CreateProgramData,
+  UpdateProgramData,
+  ProgramCost,
+} from "@/types/programs.types";
 
 export const programsService = {
   // Get all programs
   getPrograms: async (): Promise<Program[]> => {
     const response = await api.get<ApiResponse<ProgramPageResponse>>(
-      "/application/api/programs"
+      "/application/api/programs",
     );
     return response.data.body.content;
   },
@@ -14,7 +20,7 @@ export const programsService = {
   // Get program by ID
   getProgramById: async (programId: number): Promise<Program> => {
     const response = await api.get<ApiResponse<Program>>(
-      `/application/api/programs/${programId}`
+      `/application/api/programs/${programId}`,
     );
     return response.data.body;
   },
@@ -23,7 +29,7 @@ export const programsService = {
   createProgram: async (programData: CreateProgramData): Promise<Program> => {
     const response = await api.post<ApiResponse<Program>>(
       "/application/api/programs/new",
-      programData
+      programData,
     );
     return response.data.body;
   },
@@ -31,11 +37,28 @@ export const programsService = {
   // Update program
   updateProgram: async (
     programId: number,
-    programData: UpdateProgramData
+    programData: UpdateProgramData,
   ): Promise<Program> => {
     const response = await api.put<ApiResponse<Program>>(
       `/application/api/programs/${programId}`,
-      programData
+      programData,
+    );
+    return response.data.body;
+  },
+
+  // Update program cost
+  updateProgramCost: async (
+    programId: number,
+    costId: number,
+    costData: {
+      description: string;
+      amountInKES: number;
+      amountInUSD: number | null;
+    },
+  ): Promise<ProgramCost> => {
+    const response = await api.put<ApiResponse<ProgramCost>>(
+      `/application/api/programs/${programId}/costs/${costId}`,
+      costData,
     );
     return response.data.body;
   },
