@@ -220,7 +220,7 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-textDark mb-1">SMTP Port</label>
-                        <input type="number" className="input-field" placeholder="e.g. 587" />
+                        <input type="text" className="input-field" placeholder="e.g. 587" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-textDark mb-1">Encryption</label>

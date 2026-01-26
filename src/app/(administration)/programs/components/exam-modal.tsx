@@ -166,7 +166,7 @@ export default function ExamModal({ isOpen, onClose, onSuccess, courseUnitId, in
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Total Marks *</label>
                   <input
-                    type="number"
+                    type="text"
                     value={form.totalMarks}
                     onChange={(e) => handleChange("totalMarks", parseFloat(e.target.value || "0"))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -176,7 +176,7 @@ export default function ExamModal({ isOpen, onClose, onSuccess, courseUnitId, in
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Passing Marks *</label>
                   <input
-                    type="number"
+                    type="text"
                     value={form.passingMarks}
                     onChange={(e) => handleChange("passingMarks", parseFloat(e.target.value || "0"))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"

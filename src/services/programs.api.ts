@@ -6,6 +6,7 @@ import type {
   CreateProgramData,
   UpdateProgramData,
   ProgramCost,
+  CreateProgramCostData,
 } from "@/types/programs.types";
 
 export const programsService = {
@@ -58,6 +59,18 @@ export const programsService = {
   ): Promise<ProgramCost> => {
     const response = await api.put<ApiResponse<ProgramCost>>(
       `/application/api/programs/${programId}/costs/${costId}`,
+      costData,
+    );
+    return response.data.body;
+  },
+
+  // Add program cost
+  addProgramCost: async (
+    programId: number,
+    costData: CreateProgramCostData,
+  ): Promise<ProgramCost> => {
+    const response = await api.post<ApiResponse<ProgramCost>>(
+      `/application/api/programs/${programId}/costs/`,
       costData,
     );
     return response.data.body;
