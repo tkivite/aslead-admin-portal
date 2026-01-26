@@ -74,7 +74,7 @@ export interface UpdateProgramData {
   name: string;
   description: string;
   durationMonths: number;
-  tuitionFee: string;
+
   contacts: string;
 }
 

@@ -1,3 +1,5 @@
+import { ProgramCost } from "./programs.types";
+
 export interface Application {
   applicationId: number;
   applicant: {
@@ -23,6 +25,7 @@ export interface Application {
     description: string;
     durationMonths: number;
     tuitionFee: number;
+    costs?: ProgramCost[];
   };
   campus: {
     id: number;
@@ -69,10 +72,10 @@ export interface Applicant {
 }
 export interface Document {
 
-    documentId: number;
+  documentId: number;
   content: string; // Base64 encoded content
   documentType: string;
-  }
+}
   
 
 

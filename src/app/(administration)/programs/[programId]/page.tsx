@@ -8,7 +8,6 @@ import {
   Edit3,
   X,
   Check,
-
   Plus,
   BookOpen,
   Loader2,
@@ -41,7 +40,7 @@ export default function ProgramDetailPage() {
     name: "",
     description: "",
     durationMonths: 0,
-    tuitionFee: "",
+
     contacts: "",
   });
 
@@ -68,6 +67,7 @@ export default function ProgramDetailPage() {
     amountInKES: 0,
     amountInUSD: 0 as number | null,
   });
+  const [costType, setCostType] = useState<string>("Tuition fees");
 
   const fetchProgram = useCallback(async () => {
     try {
@@ -79,7 +79,7 @@ export default function ProgramDetailPage() {
         name: programData.name,
         description: programData.description,
         durationMonths: programData.durationMonths,
-        tuitionFee: programData.tuitionFee.toString(),
+
         contacts: programData.contacts || "",
       });
     } catch (error) {
@@ -154,7 +154,7 @@ export default function ProgramDetailPage() {
         name: program.name,
         description: program.description,
         durationMonths: program.durationMonths,
-        tuitionFee: program.tuitionFee.toString(),
+
         contacts: program.contacts || "",
       });
     }
@@ -256,12 +256,12 @@ export default function ProgramDetailPage() {
     }).format(amount);
   };
 
-
   /* Cost Management Functions */
   const handleAddCost = () => {
     setEditingCost(null);
+    setCostType("Tuition fees");
     setCostForm({
-      description: "",
+      description: "Tuition fees",
       amountInKES: 0,
       amountInUSD: null,
     });
@@ -270,6 +270,17 @@ export default function ProgramDetailPage() {
 
   const handleEditCost = (cost: ProgramCost) => {
     setEditingCost(cost);
+
+    // Determine the cost type based on description
+    let type = "Other";
+    if (
+      cost.description === "Tuition fees" ||
+      cost.description === "Application fees"
+    ) {
+      type = cost.description;
+    }
+    setCostType(type);
+
     setCostForm({
       description: cost.description,
       amountInKES: cost.amountInKES,
@@ -473,8 +484,6 @@ export default function ProgramDetailPage() {
                       </p>
                     )}
                   </div>
-
-                
                 </div>
 
                 <div>
@@ -633,9 +642,7 @@ export default function ProgramDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-           
-
-             {/* Program Costs Card */}
+            {/* Program Costs Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -722,8 +729,6 @@ export default function ProgramDetailPage() {
                 )}
               </div>
             </motion.div>
-
-           
           </div>
         </div>
       </div>
@@ -745,16 +750,48 @@ export default function ProgramDetailPage() {
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Cost Type
                 </label>
-                <input
-                  type="text"
-                  value={costForm.description}
-                  onChange={(e) =>
-                    setCostForm({ ...costForm, description: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
+                <select
+                  value={costType}
+                  onChange={(e) => {
+                    const newType = e.target.value;
+                    setCostType(newType);
+                    if (newType !== "Other") {
+                      setCostForm((prev) => ({
+                        ...prev,
+                        description: newType,
+                      }));
+                    } else {
+                      setCostForm((prev) => ({ ...prev, description: "" }));
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mb-3"
+                >
+                  <option value="Tuition fees">Tuition fees</option>
+                  <option value="Application fees">Application fees</option>
+                  <option value="Other">Other</option>
+                </select>
+
+                {costType === "Other" && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      value={costForm.description}
+                      onChange={(e) =>
+                        setCostForm({
+                          ...costForm,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Enter cost description"
+                    />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

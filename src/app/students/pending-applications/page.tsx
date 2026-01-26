@@ -185,7 +185,7 @@ export default function PendingApplicationsPage() {
         <span className="text-sm text-gray-600">{app.campus.name}</span>
       ),
     },
-    {
+    /*  {
       key: "feeAmount",
       label: "Fee Amount",
       render: (app: Application) => (
@@ -193,7 +193,7 @@ export default function PendingApplicationsPage() {
           KES {app.feeAmount.toLocaleString()}
         </span>
       ),
-    },
+    }, */
     {
       key: "status",
       label: "Status",
@@ -295,7 +295,11 @@ export default function PendingApplicationsPage() {
           </p>
           <p>
             <span className="font-medium">Tuition:</span> KES{" "}
-            {app.program.tuitionFee.toLocaleString()}
+            {(
+              app.program.costs?.find((c) =>
+                c.description.toLowerCase().includes("tuition fees"),
+              )?.amountInKES || 0
+            ).toLocaleString()}
           </p>
           <p className="flex items-center gap-2">
             <MapPin className="h-3 w-3" />

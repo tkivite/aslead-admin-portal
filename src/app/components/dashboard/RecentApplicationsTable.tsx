@@ -1,35 +1,44 @@
-"use client"
+"use client";
 
-import { AnimatePresence, motion } from "framer-motion"
-import type { Application } from "@/types/applications.types"
-import React, { useState } from "react"
-import { Calendar, ChevronDown, ChevronRight, CreditCard, MapPin } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion";
+import type { Application } from "@/types/applications.types";
+import React, { useState } from "react";
+import {
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  CreditCard,
+  MapPin,
+} from "lucide-react";
 
 interface RecentApplicationsTableProps {
-  applications: Application[]
-  loading?: boolean
+  applications: Application[];
+  loading?: boolean;
 }
 
-export default function RecentApplicationsTable({ applications, loading = false }: RecentApplicationsTableProps) {
-  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
+export default function RecentApplicationsTable({
+  applications,
+  loading = false,
+}: RecentApplicationsTableProps) {
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const toggleRow = (applicationId: number) => {
-    const newExpanded = new Set(expandedRows)
+    const newExpanded = new Set(expandedRows);
     if (newExpanded.has(applicationId)) {
-      newExpanded.delete(applicationId)
+      newExpanded.delete(applicationId);
     } else {
-      newExpanded.add(applicationId)
+      newExpanded.add(applicationId);
     }
-    setExpandedRows(newExpanded)
-  }
+    setExpandedRows(newExpanded);
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   if (loading) {
     return (
@@ -40,7 +49,7 @@ export default function RecentApplicationsTable({ applications, loading = false 
           </div>
         ))}
       </div>
-    )
+    );
   }
 
   return (
@@ -55,11 +64,21 @@ export default function RecentApplicationsTable({ applications, loading = false 
           <thead>
             <tr className="bg-tertiary text-white">
               <th className="px-4 py-3 text-left text-sm font-medium w-8"></th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Applicant</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Program</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Campus</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Fee Amount</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Status</th>
+              <th className="px-4 py-3 text-left text-sm font-medium">
+                Applicant
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium">
+                Program
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium">
+                Campus
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium">
+                Fee Amount
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium">
+                Status
+              </th>
               <th className="px-4 py-3 text-left text-sm font-medium">Date</th>
             </tr>
           </thead>
@@ -83,18 +102,27 @@ export default function RecentApplicationsTable({ applications, loading = false 
                   <td className="px-4 py-3">
                     <div>
                       <div className="text-sm font-medium text-textDark">
-                        {application?.applicant?.firstName} {application?.applicant?.lastName}
+                        {application?.applicant?.firstName}{" "}
+                        {application?.applicant?.lastName}
                       </div>
-                      <div className="text-xs text-gray-500">{application?.applicant?.email}</div>
+                      <div className="text-xs text-gray-500">
+                        {application?.applicant?.email}
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <div>
-                      <div className="text-sm font-medium text-textDark">{application.program.code}</div>
-                      <div className="text-xs text-gray-500">{application.program.name}</div>
+                      <div className="text-sm font-medium text-textDark">
+                        {application.program.code}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {application.program.name}
+                      </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{application.campus.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {application.campus.name}
+                  </td>
                   <td className="px-4 py-3 text-sm font-medium text-tertiary">
                     KES {application?.feeAmount?.toLocaleString()}
                   </td>
@@ -111,7 +139,9 @@ export default function RecentApplicationsTable({ applications, loading = false 
                       {application.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{formatDate(application.submittedAt)}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {formatDate(application.submittedAt)}
+                  </td>
                 </motion.tr>
 
                 <AnimatePresence>
@@ -131,17 +161,22 @@ export default function RecentApplicationsTable({ applications, loading = false 
                             </h4>
                             <div className="text-sm space-y-1">
                               <p>
-                                <span className="font-medium">Mobile:</span> {application?.applicant?.mobile}
+                                <span className="font-medium">Mobile:</span>{" "}
+                                {application?.applicant?.mobile}
                               </p>
                               <p>
-                                <span className="font-medium">DOB:</span> {formatDate(application?.applicant?.dob)}
+                                <span className="font-medium">DOB:</span>{" "}
+                                {formatDate(application?.applicant?.dob)}
                               </p>
                               <p>
                                 <span className="font-medium">Education:</span>{" "}
                                 {application?.applicant?.currentEducationLevel}
                               </p>
                               <p>
-                                <span className="font-medium">Citizenship:</span> {application?.applicant?.citizenship}
+                                <span className="font-medium">
+                                  Citizenship:
+                                </span>{" "}
+                                {application?.applicant?.citizenship}
                               </p>
                             </div>
                           </div>
@@ -153,15 +188,23 @@ export default function RecentApplicationsTable({ applications, loading = false 
                             </h4>
                             <div className="text-sm space-y-1">
                               <p>
-                                <span className="font-medium">Duration:</span> {application.program.durationMonths}{" "}
-                                months
+                                <span className="font-medium">Duration:</span>{" "}
+                                {application.program.durationMonths} months
                               </p>
                               <p>
-                                <span className="font-medium">Tuition:</span> KES{" "}
-                                {application.program.tuitionFee.toLocaleString()}
+                                <span className="font-medium">Tuition:</span>{" "}
+                                KES{" "}
+                                {(
+                                  application.program.costs?.find((c) =>
+                                    c.description
+                                      .toLowerCase()
+                                      .includes("tuition fees"),
+                                  )?.amountInKES || 0
+                                ).toLocaleString()}
                               </p>
                               <p>
-                                <span className="font-medium">Campus:</span> {application.campus.location}
+                                <span className="font-medium">Campus:</span>{" "}
+                                {application.campus.location}
                               </p>
                             </div>
                           </div>
@@ -181,14 +224,19 @@ export default function RecentApplicationsTable({ applications, loading = false 
                                       : "bg-red-100 text-red-600"
                                   }`}
                                 >
-                                  {application?.feePaymentStatus?.replace("_", " ")}
+                                  {application?.feePaymentStatus?.replace(
+                                    "_",
+                                    " ",
+                                  )}
                                 </span>
                               </p>
                               <p>
-                                <span className="font-medium">Reference:</span> {application?.paymentReference || "N/A"}
+                                <span className="font-medium">Reference:</span>{" "}
+                                {application?.paymentReference || "N/A"}
                               </p>
                               <p>
-                                <span className="font-medium">Applied:</span> {formatDate(application?.createdAt)}
+                                <span className="font-medium">Applied:</span>{" "}
+                                {formatDate(application?.createdAt)}
                               </p>
                             </div>
                           </div>
@@ -203,5 +251,5 @@ export default function RecentApplicationsTable({ applications, loading = false 
         </table>
       </div>
     </motion.div>
-  )
+  );
 }
