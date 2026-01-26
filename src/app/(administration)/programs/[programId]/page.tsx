@@ -8,9 +8,7 @@ import {
   Edit3,
   X,
   Check,
-  Clock,
-  DollarSign,
-  Users,
+
   Plus,
   BookOpen,
   Loader2,
@@ -258,20 +256,18 @@ export default function ProgramDetailPage() {
     }).format(amount);
   };
 
-  const getTuitionCost = useCallback(() => {
-    if (!program?.costs) return null;
-    // User requested to find the cost with description "Tuition fees" (check case insensitive)
-    return (
-      program.costs.find((c) =>
-        c.description.toLowerCase().includes("tuition fees"),
-      ) ||
-      program.costs.find((c) =>
-        c.description.toLowerCase().includes("tution fees"),
-      )
-    ); // Handle typo in JSON
-  }, [program]);
 
   /* Cost Management Functions */
+  const handleAddCost = () => {
+    setEditingCost(null);
+    setCostForm({
+      description: "",
+      amountInKES: 0,
+      amountInUSD: null,
+    });
+    setShowEditCostModal(true);
+  };
+
   const handleEditCost = (cost: ProgramCost) => {
     setEditingCost(cost);
     setCostForm({
@@ -283,21 +279,26 @@ export default function ProgramDetailPage() {
   };
 
   const handleSaveCost = async () => {
-    if (!program || !editingCost) return;
+    if (!program) return;
 
     try {
-      await programsService.updateProgramCost(
-        program.programId,
-        editingCost.costId,
-        costForm,
-      );
-      toast.success("Cost updated successfully!");
+      if (editingCost) {
+        await programsService.updateProgramCost(
+          program.programId,
+          editingCost.costId,
+          costForm,
+        );
+        toast.success("Cost updated successfully!");
+      } else {
+        await programsService.addProgramCost(program.programId, costForm);
+        toast.success("Cost added successfully!");
+      }
       setShowEditCostModal(false);
       setEditingCost(null);
       fetchProgram(); // Refresh data
     } catch (error) {
-      console.error("Error updating cost:", error);
-      toast.error("Failed to update cost. Please try again.");
+      console.error("Error saving cost:", error);
+      toast.error("Failed to save cost. Please try again.");
     }
   };
 
@@ -473,30 +474,7 @@ export default function ProgramDetailPage() {
                     )}
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tuition Fee
-                    </label>
-                    <div className="text-gray-600">
-                      {(() => {
-                        const tuition = getTuitionCost();
-                        if (tuition) {
-                          return (
-                            <div className="flex flex-col">
-                              <span>{formatCurrency(tuition.amountInKES)}</span>
-                              {tuition.amountInUSD && (
-                                <span className="text-sm text-gray-500">
-                                  {formatUSD(tuition.amountInUSD)}
-                                </span>
-                              )}
-                            </div>
-                          );
-                        }
-                        // Fallback to old field if no cost object found
-                        return formatCurrency(program.tuitionFee);
-                      })()}
-                    </div>
-                  </div>
+                
                 </div>
 
                 <div>
@@ -655,115 +633,27 @@ export default function ProgramDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Status Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Status
-              </h3>
+           
 
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Duration
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {program.durationMonths} months
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <DollarSign className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Tuition Fee
-                    </p>
-                    <div className="text-sm text-gray-600">
-                      {(() => {
-                        const tuition = getTuitionCost();
-                        if (tuition) {
-                          return (
-                            <div>
-                              <p>{formatCurrency(tuition.amountInKES)}</p>
-                              {tuition.amountInUSD && (
-                                <p className="text-xs text-gray-500">
-                                  {formatUSD(tuition.amountInUSD)}
-                                </p>
-                              )}
-                            </div>
-                          );
-                        }
-                        return formatCurrency(program.tuitionFee);
-                      })()}
-                    </div>
-                  </div>
-                </div>
-
-                {program.contacts && (
-                  <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Contact
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {program.contacts}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Timeline Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Timeline
-              </h3>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Created</p>
-                  <p className="text-sm text-gray-600">
-                    {formatDate(program.createdAt)}
-                  </p>
-                </div>
-
-                {program.updatedAt && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Last Updated
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {formatDate(program.updatedAt)}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Program Costs Card */}
+             {/* Program Costs Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Program Costs
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Program Costs
+                </h3>
+                <button
+                  onClick={handleAddCost}
+                  className="p-1 text-primary hover:bg-blue-50 rounded-full transition-colors"
+                  title="Add Cost"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
 
               <div className="space-y-4">
                 {program.costs && program.costs.length > 0 ? (
@@ -800,12 +690,46 @@ export default function ProgramDetailPage() {
                 )}
               </div>
             </motion.div>
+
+            {/* Timeline Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            >
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Timeline
+              </h3>
+
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Created</p>
+                  <p className="text-sm text-gray-600">
+                    {formatDate(program.createdAt)}
+                  </p>
+                </div>
+
+                {program.updatedAt && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Last Updated
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formatDate(program.updatedAt)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+
+           
           </div>
         </div>
       </div>
 
       {/* Edit Cost Modal */}
-      {showEditCostModal && editingCost && (
+      {showEditCostModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -814,7 +738,9 @@ export default function ProgramDetailPage() {
             className="bg-white rounded-lg shadow-lg w-full max-w-md"
           >
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold">Edit Cost</h2>
+              <h2 className="text-xl font-semibold">
+                {editingCost ? "Edit Cost" : "Add Cost"}
+              </h2>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -835,7 +761,7 @@ export default function ProgramDetailPage() {
                   Amount (KES)
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   value={costForm.amountInKES}
                   onChange={(e) =>
                     setCostForm({
@@ -851,7 +777,7 @@ export default function ProgramDetailPage() {
                   Amount (USD) - Optional
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   value={costForm.amountInUSD || ""}
                   onChange={(e) =>
                     setCostForm({

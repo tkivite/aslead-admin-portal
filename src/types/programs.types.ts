@@ -77,3 +77,9 @@ export interface UpdateProgramData {
   tuitionFee: string;
   contacts: string;
 }
+
+export interface CreateProgramCostData {
+  description: string;
+  amountInKES: number;
+  amountInUSD: number | null;
+}
