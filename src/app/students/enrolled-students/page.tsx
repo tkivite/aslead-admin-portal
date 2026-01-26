@@ -1,74 +1,89 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { motion } from "framer-motion"
-import { Calendar, MapPin, User, Phone, Mail, GraduationCap, Edit } from "lucide-react"
-import DataTable from "@/app/components/common/DataTable"
-import TableFilters, { FilterOptions } from "@/app/components/common/TableFilters"
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import {
+  Calendar,
+  MapPin,
+  User,
+  Phone,
+  Mail,
+  GraduationCap,
+  Edit,
+} from "lucide-react";
+import DataTable from "@/app/components/common/DataTable";
+import TableFilters, {
+  FilterOptions,
+} from "@/app/components/common/TableFilters";
 
-import type { Student,  Campus } from "@/types/students.types"
-import type { Program } from "@/types/programs.types"
-import { exportStudentsToCSV } from "@/utils/csvExport"
-import DocumentsViewer from "@/app/components/common/DocumentsViewer"
-import DocumentsEditor from "@/app/components/common/DocumentsEditor"
-import { studentsService } from "@/services/students.api"
-import EditStudentModal from "../components/edit-student-modal"
+import type { Student, Campus } from "@/types/students.types";
+import type { Program } from "@/types/programs.types";
+import { exportStudentsToCSV } from "@/utils/csvExport";
+import DocumentsViewer from "@/app/components/common/DocumentsViewer";
+import DocumentsEditor from "@/app/components/common/DocumentsEditor";
+import { studentsService } from "@/services/students.api";
+import EditStudentModal from "../components/edit-student-modal";
 
 export default function EnrolledStudentsPage() {
-  const [students, setStudents] = useState<Student[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [totalElements, setTotalElements] = useState(0)
-  const [filters, setFilters] = useState<FilterOptions>({})
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
-  const [docEditorOpen, setDocEditorOpen] = useState(false)
-  const [docEditorStudent, setDocEditorStudent] = useState<Student | null>(null)
-  const [programs, setPrograms] = useState<Program[]>([])
-  const [campuses, setCampuses] = useState<Campus[]>([])
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [filters, setFilters] = useState<FilterOptions>({});
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [docEditorOpen, setDocEditorOpen] = useState(false);
+  const [docEditorStudent, setDocEditorStudent] = useState<Student | null>(
+    null,
+  );
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [campuses, setCampuses] = useState<Campus[]>([]);
 
   const fetchStudents = useCallback(async () => {
     try {
-      setLoading(true)
-      const response = await studentsService.getPaginatedStudents(currentPage, 10, "ENROLLED", filters)
-      setStudents(response.content)
-      setTotalPages(response.totalPages)
-      setTotalElements(response.totalElements)
+      setLoading(true);
+      const response = await studentsService.getPaginatedStudents(
+        currentPage,
+        10,
+        "ENROLLED",
+        filters,
+      );
+      setStudents(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
     } catch (error) {
-      console.error("Error fetching enrolled students:", error)
+      console.error("Error fetching enrolled students:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [currentPage, filters])
+  }, [currentPage, filters]);
 
   useEffect(() => {
-    fetchStudents()
-    fetchProgramsAndCampuses()
-  }, [fetchStudents])
+    fetchStudents();
+    fetchProgramsAndCampuses();
+  }, [fetchStudents]);
 
   const fetchProgramsAndCampuses = async () => {
     try {
       const [programsData, campusesData] = await Promise.all([
         studentsService.getPrograms(),
         studentsService.getCampuses(),
-      ])
-      setPrograms(programsData)
-      setCampuses(campusesData)
+      ]);
+      setPrograms(programsData);
+      setCampuses(campusesData);
     } catch (error) {
-      console.error("Error fetching programs and campuses:", error)
+      console.error("Error fetching programs and campuses:", error);
     }
-  }
-
-
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   const columns = [
     {
@@ -77,7 +92,8 @@ export default function EnrolledStudentsPage() {
       render: (student: Student) => (
         <div>
           <div className="text-sm font-medium text-textDark">
-            {student.applicant.firstName} {student.applicant.middleName} {student.applicant.lastName}
+            {student.applicant.firstName} {student.applicant.middleName}{" "}
+            {student.applicant.lastName}
           </div>
           <div className="text-xs text-gray-500">{student.admissionNumber}</div>
         </div>
@@ -88,15 +104,23 @@ export default function EnrolledStudentsPage() {
       label: "Program",
       render: (student: Student) => (
         <div>
-          <div className="text-sm font-medium text-textDark">{student.application.program.code}</div>
-          <div className="text-xs text-gray-500">{student.application.program.name}</div>
+          <div className="text-sm font-medium text-textDark">
+            {student.application.program.code}
+          </div>
+          <div className="text-xs text-gray-500">
+            {student.application.program.name}
+          </div>
         </div>
       ),
     },
     {
       key: "campus",
       label: "Campus",
-      render: (student: Student) => <span className="text-sm text-gray-600">{student.application.campus.name}</span>,
+      render: (student: Student) => (
+        <span className="text-sm text-gray-600">
+          {student.application.campus.name}
+        </span>
+      ),
     },
     {
       key: "enrollmentStatus",
@@ -110,7 +134,11 @@ export default function EnrolledStudentsPage() {
     {
       key: "enrolledAt",
       label: "Enrolled",
-      render: (student: Student) => <span className="text-sm text-gray-600">{formatDate(student.enrolledAt)}</span>,
+      render: (student: Student) => (
+        <span className="text-sm text-gray-600">
+          {formatDate(student.enrolledAt)}
+        </span>
+      ),
     },
     {
       key: "actions",
@@ -125,7 +153,7 @@ export default function EnrolledStudentsPage() {
         </button>
       ),
     },
-  ]
+  ];
 
   const expandableRow = (student: Student) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -137,20 +165,25 @@ export default function EnrolledStudentsPage() {
         <div className="text-sm space-y-1">
           <p className="flex items-center gap-2">
             <Phone className="h-3 w-3" />
-            <span className="font-medium">Mobile:</span> {student.applicant.mobile}
+            <span className="font-medium">Mobile:</span>{" "}
+            {student.applicant.mobile}
           </p>
           <p className="flex items-center gap-2">
             <Mail className="h-3 w-3" />
-            <span className="font-medium">Email:</span> {student.applicant.email}
+            <span className="font-medium">Email:</span>{" "}
+            {student.applicant.email}
           </p>
           <p>
-            <span className="font-medium">DOB:</span> {formatDate(student.applicant.dob)}
+            <span className="font-medium">DOB:</span>{" "}
+            {formatDate(student.applicant.dob)}
           </p>
           <p>
-            <span className="font-medium">Education:</span> {student.applicant.currentEducationLevel}
+            <span className="font-medium">Education:</span>{" "}
+            {student.applicant.currentEducationLevel}
           </p>
           <p>
-            <span className="font-medium">Citizenship:</span> {student.applicant.citizenship}
+            <span className="font-medium">Citizenship:</span>{" "}
+            {student.applicant.citizenship}
           </p>
         </div>
       </div>
@@ -162,14 +195,21 @@ export default function EnrolledStudentsPage() {
         </h4>
         <div className="text-sm space-y-1">
           <p>
-            <span className="font-medium">Duration:</span> {student.application.program.durationMonths} months
+            <span className="font-medium">Duration:</span>{" "}
+            {student.application.program.durationMonths} months
           </p>
           <p>
-            <span className="font-medium">Tuition:</span> KES {student.application.program.tuitionFee.toLocaleString()}
+            <span className="font-medium">Tuition:</span> KES{" "}
+            {(
+              student.application.program.costs?.find((c) =>
+                c.description.toLowerCase().includes("tuition fees"),
+              )?.amountInKES || 0
+            ).toLocaleString()}
           </p>
           <p className="flex items-center gap-2">
             <MapPin className="h-3 w-3" />
-            <span className="font-medium">Campus:</span> {student.application.campus.location}
+            <span className="font-medium">Campus:</span>{" "}
+            {student.application.campus.location}
           </p>
         </div>
       </div>
@@ -184,10 +224,12 @@ export default function EnrolledStudentsPage() {
             <span className="font-medium">Student ID:</span> {student.studentId}
           </p>
           <p>
-            <span className="font-medium">Enrolled:</span> {formatDate(student.enrolledAt)}
+            <span className="font-medium">Enrolled:</span>{" "}
+            {formatDate(student.enrolledAt)}
           </p>
           <p>
-            <span className="font-medium">Application:</span> {formatDate(student.application.submittedAt)}
+            <span className="font-medium">Application:</span>{" "}
+            {formatDate(student.application.submittedAt)}
           </p>
           <p>
             <span className="font-medium">Fee Status:</span>
@@ -210,8 +252,8 @@ export default function EnrolledStudentsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                setDocEditorStudent(student)
-                setDocEditorOpen(true)
+                setDocEditorStudent(student);
+                setDocEditorOpen(true);
               }}
               className="px-3 py-1 text-xs bg-gray-100 rounded-md hover:bg-gray-200"
             >
@@ -221,32 +263,37 @@ export default function EnrolledStudentsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 
   const handleExport = () => {
-    exportStudentsToCSV(students)
-  }
+    exportStudentsToCSV(students);
+  };
 
   const handleEditClick = (student: Student) => {
-    setSelectedStudent(student)
-    setIsEditModalOpen(true)
-  }
+    setSelectedStudent(student);
+    setIsEditModalOpen(true);
+  };
 
   const handleEditSuccess = () => {
-    fetchStudents()
-    setIsEditModalOpen(false)
-    setSelectedStudent(null)
-  }
+    fetchStudents();
+    setIsEditModalOpen(false);
+    setSelectedStudent(null);
+  };
 
   return (
     <div className="p-6 space-y-6 relative">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-textDark mb-2">Enrolled Students</h1>
+            <h1 className="text-3xl font-bold text-textDark mb-2">
+              Enrolled Students
+            </h1>
             <p className="text-gray-600">Manage currently enrolled students</p>
           </div>
-       
         </div>
       </motion.div>
 
@@ -268,13 +315,13 @@ export default function EnrolledStudentsPage() {
             { value: "COMPLETED", label: "Completed" },
             { value: "DROPPED", label: "Dropped" },
           ]}
-          campusOptions={campuses.map(campus => ({
+          campusOptions={campuses.map((campus) => ({
             value: campus.id,
-            label: `${campus.name} - ${campus.location}`
+            label: `${campus.name} - ${campus.location}`,
           }))}
-          programOptions={programs.map(program => ({
+          programOptions={programs.map((program) => ({
             value: program.programId,
-            label: `${program.name} - ${program.code}`
+            label: `${program.name} - ${program.code}`,
           }))}
           sortOptions={[
             { value: "createdAt", label: "Created Date" },
@@ -303,8 +350,8 @@ export default function EnrolledStudentsPage() {
       <EditStudentModal
         isOpen={isEditModalOpen}
         onClose={() => {
-          setIsEditModalOpen(false)
-          setSelectedStudent(null)
+          setIsEditModalOpen(false);
+          setSelectedStudent(null);
         }}
         onSuccess={handleEditSuccess}
         student={selectedStudent}
@@ -313,13 +360,13 @@ export default function EnrolledStudentsPage() {
       <DocumentsEditor
         isOpen={docEditorOpen}
         onClose={() => {
-          setDocEditorOpen(false)
-          setDocEditorStudent(null)
+          setDocEditorOpen(false);
+          setDocEditorStudent(null);
         }}
         onSuccess={() => {
-          fetchStudents()
-          setDocEditorOpen(false)
-          setDocEditorStudent(null)
+          fetchStudents();
+          setDocEditorOpen(false);
+          setDocEditorStudent(null);
         }}
         applicantId={docEditorStudent?.applicant?.applicantId ?? 0}
         applicationId={docEditorStudent?.application?.applicationId ?? 0}
@@ -329,5 +376,5 @@ export default function EnrolledStudentsPage() {
         paymentReference={docEditorStudent?.application?.paymentReference}
       />
     </div>
-  )
+  );
 }

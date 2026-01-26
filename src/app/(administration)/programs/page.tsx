@@ -126,10 +126,12 @@ export default function ProgramsPage() {
                   <Clock className="w-4 h-4" />
                   <span>{program.durationMonths} months</span>
                 </div>
-                
+
                 {(() => {
-                  const tuitionCost = program.costs?.find((c) => c.description === "Tution fees");
-                  const kesAmount = tuitionCost ? tuitionCost.amountInKES : program.tuitionFee;
+                  const tuitionCost = program.costs?.find(
+                    (c) => c.description === "Tuition fees",
+                  );
+                  const kesAmount = tuitionCost?.amountInKES || 0;
                   const usdAmount = tuitionCost?.amountInUSD;
 
                   return (
@@ -147,7 +149,6 @@ export default function ProgramsPage() {
                   );
                 })()}
 
-
                 {program.contacts && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Users className="w-4 h-4" />
@@ -158,13 +159,9 @@ export default function ProgramsPage() {
 
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>
-                    Created: {formatDate(program.createdAt)}
-                  </span>
+                  <span>Created: {formatDate(program.createdAt)}</span>
                   {program.updatedAt && (
-                    <span>
-                      Updated: {formatDate(program.updatedAt)}
-                    </span>
+                    <span>Updated: {formatDate(program.updatedAt)}</span>
                   )}
                 </div>
               </div>
