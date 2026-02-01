@@ -67,9 +67,9 @@ export default function MpesaPaymentsPage() {
       label: "From",
       render: (payment: MpesaPayment) => (
         <div>
-          <div className="text-sm font-medium text-textDark">{payment.FirstName}</div>
+          <div className="text-sm font-medium text-textDark">{payment?.FirstName}</div>
           <div className="text-xs text-gray-500 font-mono">
-            {payment.MSISDN.length > 20 ? `${payment.MSISDN.substring(0, 20)}...` : payment.MSISDN}
+            {payment?.MSISDN?.length > 20 ? `${payment?.MSISDN?.substring(0, 20)}...` : payment?.MSISDN}
           </div>
         </div>
       ),
@@ -79,8 +79,8 @@ export default function MpesaPaymentsPage() {
       label: "Transaction ID",
       render: (payment: MpesaPayment) => (
         <div>
-          <div className="text-sm font-medium text-textDark font-mono">{payment.TransID}</div>
-          <div className="text-xs text-gray-500">{payment.BillRefNumber}</div>
+          <div className="text-sm font-medium text-textDark font-mono">{payment?.TransID}</div>
+          <div className="text-xs text-gray-500">{payment?.BillRefNumber}</div>
         </div>
       ),
     },
@@ -88,7 +88,7 @@ export default function MpesaPaymentsPage() {
       key: "TransAmount",
       label: "Amount",
       render: (payment: MpesaPayment) => (
-        <span className="text-sm font-bold text-tertiary">KES {payment.TransAmount.toLocaleString()}</span>
+        <span className="text-sm font-bold text-tertiary">KES {payment?.TransAmount?.toLocaleString()}</span>
       ),
     },
     {
@@ -96,7 +96,7 @@ export default function MpesaPaymentsPage() {
       label: "Type",
       render: (payment: MpesaPayment) => (
         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary">
-          {payment.TransactionType}
+          {payment?.TransactionType}
         </span>
       ),
     },
@@ -105,8 +105,8 @@ export default function MpesaPaymentsPage() {
       label: "Transaction Time",
       render: (payment: MpesaPayment) => (
         <div>
-          <div className="text-sm text-gray-600">{formatTransactionTime(payment.TransTime)}</div>
-          <div className="text-xs text-gray-500">{formatDate(payment.createdAt)}</div>
+          <div className="text-sm text-gray-600">{formatTransactionTime(payment?.TransTime)}</div>
+          <div className="text-xs text-gray-500">{formatDate(payment?.createdAt)}</div>
         </div>
       ),
     },
@@ -121,16 +121,16 @@ export default function MpesaPaymentsPage() {
         </h4>
         <div className="text-sm space-y-1">
           <p>
-            <span className="font-medium">Transaction ID:</span> {payment.TransID}
+            <span className="font-medium">Transaction ID:</span> {payment?.TransID}
           </p>
           <p>
-            <span className="font-medium">Business Code:</span> {payment.BusinessShortCode}
+            <span className="font-medium">Business Code:</span> {payment?.BusinessShortCode}
           </p>
           <p>
-            <span className="font-medium">Bill Reference:</span> {payment.BillRefNumber}
+            <span className="font-medium">Bill Reference:</span> {payment?.BillRefNumber}
           </p>
           <p>
-            <span className="font-medium">Third Party ID:</span> {payment.ThirdPartyTransID || "N/A"}
+            <span className="font-medium">Third Party ID:</span> {payment?.ThirdPartyTransID || "N/A"}
           </p>
         </div>
       </div>
@@ -142,13 +142,13 @@ export default function MpesaPaymentsPage() {
         </h4>
         <div className="text-sm space-y-1">
           <p>
-            <span className="font-medium">Amount:</span> KES {payment.TransAmount.toLocaleString()}
+            <span className="font-medium">Amount:</span> KES {payment?.TransAmount.toLocaleString()}
           </p>
           <p>
-            <span className="font-medium">Account Balance:</span> KES {payment.OrgAccountBalance.toLocaleString()}
+            <span className="font-medium">Account Balance:</span> KES {payment?.OrgAccountBalance?.toLocaleString()}
           </p>
           <p>
-            <span className="font-medium">Invoice Number:</span> {payment.InvoiceNumber || "N/A"}
+            <span className="font-medium">Invoice Number:</span> {payment?.InvoiceNumber || "N/A"}
           </p>
         </div>
       </div>
@@ -160,14 +160,14 @@ export default function MpesaPaymentsPage() {
         </h4>
         <div className="text-sm space-y-1">
           <p>
-            <span className="font-medium">Transaction Time:</span> {formatTransactionTime(payment.TransTime)}
+            <span className="font-medium">Transaction Time:</span> {formatTransactionTime(payment?.TransTime)}
           </p>
           <p>
-            <span className="font-medium">Recorded:</span> {formatDate(payment.createdAt)}
+            <span className="font-medium">Recorded:</span> {formatDate(payment?.createdAt)}
           </p>
           <p>
             <span className="font-medium">MSISDN:</span>
-            <span className="font-mono text-xs ml-1 break-all">{payment.MSISDN}</span>
+            <span className="font-mono text-xs ml-1 break-all">{payment?.MSISDN}</span>
           </p>
         </div>
       </div>
