@@ -82,7 +82,7 @@ export default function EditApplicationModal({
     setFormData({
       mobileNumber: application?.applicant?.mobile,
       firstName: application?.applicant?.firstName,
-      middleName: "", // Not available in Application type
+      middleName: application?.applicant?.middleName, 
       lastName: application?.applicant?.lastName,
       email: application?.applicant?.email,
       gender: application?.applicant?.gender,
@@ -152,6 +152,7 @@ export default function EditApplicationModal({
         applicantInfo: {
           firstName: applicationData.firstName,
           lastName: applicationData.lastName,
+          middleName: applicationData.middleName,
           email: applicationData.email || "",
           mobile: applicationData.mobileNumber,
           dob: applicationData.dateOfBirth,

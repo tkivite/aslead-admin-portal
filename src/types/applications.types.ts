@@ -16,7 +16,7 @@ export interface Application {
     createdAt: string;
     updatedAt: string;
     documentType: string;
-    documentNumber: number
+    documentNumber: number;
   };
   program: {
     programId: number;
@@ -71,13 +71,10 @@ export interface Applicant {
   documentNumber?: string | number;
 }
 export interface Document {
-
   documentId: number;
   content: string; // Base64 encoded content
   documentType: string;
 }
-  
-
 
 export interface DocumentResponse {
   headers: Record<string, string>;
