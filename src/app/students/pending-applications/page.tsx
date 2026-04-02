@@ -185,15 +185,25 @@ export default function PendingApplicationsPage() {
         <span className="text-sm text-gray-600">{app.campus.name}</span>
       ),
     },
-    /*  {
+    {
       key: "feeAmount",
-      label: "Fee Amount",
+      label: "Reg Fee Paid",
       render: (app: Application) => (
         <span className="text-sm font-medium text-tertiary">
           KES {app.feeAmount.toLocaleString()}
         </span>
       ),
-    }, */
+    },
+
+    {
+      key: "paymentReference",
+      label: "Payment Reference",
+      render: (app: Application) => (
+        <span className="text-sm font-medium text-tertiary">
+          KES {app.paymentReference}
+        </span>
+      ),
+    },
     {
       key: "status",
       label: "Status",
@@ -311,7 +321,7 @@ export default function PendingApplicationsPage() {
       <div className="space-y-2">
         <h4 className="font-medium text-textDark flex items-center gap-2">
           <CreditCard className="h-4 w-4" />
-          Payment Status
+          Reg Fee Status
         </h4>
         <div className="text-sm space-y-1">
           <p>
