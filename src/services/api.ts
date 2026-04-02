@@ -4,7 +4,7 @@ import { authService } from "./auth.api";
 // const BASE_URL = "https://gateway.itiksolutions.com/aslead/api";
 // const BASE_URL = "https://gateway.itiksolutions.com/aslead/sandbox";
 // Create axios instance with default config
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -29,7 +29,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
       resolve(token || undefined);
     }
   });
-  
+
   failedQueue = [];
 };
 
@@ -56,12 +56,14 @@ api.interceptors.response.use(
         // If already refreshing, queue this request
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `${token}`;
-          return api(originalRequest);
-        }).catch((err) => {
-          return Promise.reject(err);
-        });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
       }
 
       originalRequest._retry = true;
@@ -73,26 +75,31 @@ api.interceptors.response.use(
           throw new Error("No refresh token available");
         }
 
-        const refreshResponse = await authService.refreshToken(tokens.refreshToken);
+        const refreshResponse = await authService.refreshToken(
+          tokens.refreshToken
+        );
         authService.saveTokens(refreshResponse);
-        
+
         // Update the original request with new token
         originalRequest.headers.Authorization = `${refreshResponse.access_token}`;
-        
+
         // Process queued requests
         processQueue(null, refreshResponse.access_token);
-        
+
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, clear tokens and redirect to login
         processQueue(refreshError, null);
         authService.clearTokens();
-        
+
         // Redirect to login if not already there
-        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname !== "/login"
+        ) {
           window.location.href = "/login";
         }
-        
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

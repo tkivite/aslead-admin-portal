@@ -3,7 +3,7 @@ import { AuthResponse } from "@/types/api.types";
 export const authService = {
   login: async (username: string, password: string): Promise<AuthResponse> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/auth/api/v1/login`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/api/v1/login`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,11 +29,11 @@ export const authService = {
           body: JSON.stringify({ token }),
         }
       );
-      
+
       if (!response.ok) {
         return false;
       }
-      
+
       const data = await response.json();
       return data.valid === true;
     } catch (error) {
@@ -63,17 +63,17 @@ export const authService = {
   // Helper function to get stored tokens
   getStoredTokens: () => {
     if (typeof window === "undefined") return null;
-    
+
     const accessToken = localStorage.getItem("accessTokenSite");
     const refreshToken = localStorage.getItem("refreshTokenSite");
-    
+
     return accessToken && refreshToken ? { accessToken, refreshToken } : null;
   },
 
   // Helper function to save tokens
   saveTokens: (authResponse: AuthResponse) => {
     if (typeof window === "undefined") return;
-    
+
     localStorage.setItem("accessTokenSite", authResponse.access_token);
     localStorage.setItem("refreshTokenSite", authResponse.refresh_token);
   },
@@ -81,7 +81,7 @@ export const authService = {
   // Helper function to clear tokens
   clearTokens: () => {
     if (typeof window === "undefined") return;
-    
+
     localStorage.removeItem("accessTokenSite");
     localStorage.removeItem("refreshTokenSite");
   },
@@ -97,7 +97,9 @@ export const authService = {
       if (isValid) return true;
 
       // If invalid, try to refresh using refresh token
-      const refreshResponse = await authService.refreshToken(tokens.refreshToken);
+      const refreshResponse = await authService.refreshToken(
+        tokens.refreshToken
+      );
       authService.saveTokens(refreshResponse);
       return true;
     } catch (error) {
