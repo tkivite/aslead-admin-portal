@@ -9,6 +9,8 @@ import type {
   CreateProgramCostData,
 } from "@/types/programs.types";
 
+const DEFAULT_PAGE_SIZE = 15;
+
 export const programsService = {
   // Get all programs
   getPrograms: async (): Promise<Program[]> => {
@@ -16,6 +18,32 @@ export const programsService = {
       "/application/api/programs",
     );
     return response.data.body.content;
+  },
+
+  // Get paginated programs
+  getPaginatedPrograms: async (
+    page = 0,
+    size = DEFAULT_PAGE_SIZE,
+    filters?: {
+      search?: string;
+      sortBy?: string;
+      sortDirection?: "ASC" | "DESC";
+    }
+  ): Promise<ProgramPageResponse> => {
+    let url = `/application/api/programs?page=${page}&size=${size}`;
+
+    if (filters?.search) {
+      url += `&search=${encodeURIComponent(JSON.stringify({ name: filters.search, code: filters.search }))}`;
+    } else {
+      url += `&search=${encodeURIComponent(JSON.stringify({}))}`;
+    }
+
+    const sortBy = filters?.sortBy || "createdAt";
+    const sortDirection = filters?.sortDirection || "DESC";
+    url += `&sortby=${sortBy}&sortdirection=${sortDirection}`;
+
+    const response = await api.get<ApiResponse<ProgramPageResponse>>(url);
+    return response.data.body;
   },
 
   // Get program by ID
