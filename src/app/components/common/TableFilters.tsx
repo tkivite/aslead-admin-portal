@@ -46,7 +46,7 @@ export default function TableFilters({
   showEnrollmentStatusFilter = false,
   showDateRangeFilter = true,
   showSearchFilter = true,
-
+  showSortFilter = false,
   showCampusFilter = false,
   showProgramFilter = false,
   showCountryFilter = false,
@@ -57,7 +57,7 @@ export default function TableFilters({
   programOptions = [],
   countryOptions = [],
   countyOptions = [],
-
+  sortOptions = [],
   initialFilters = {},
 }: TableFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -185,6 +185,35 @@ export default function TableFilters({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
                   />
                 </div>
+              )}
+
+              {/* Sort Filter */}
+              {showSortFilter && sortOptions.length > 0 && (
+                <>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Sort By</label>
+                    <select
+                      value={tempFilters.sortBy || "createdAt"}
+                      onChange={(e) => handleFilterChange("sortBy", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
+                    >
+                      {sortOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Sort Direction</label>
+                    <select
+                      value={tempFilters.sortDirection || "DESC"}
+                      onChange={(e) => handleFilterChange("sortDirection", e.target.value as "ASC" | "DESC")}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tertiary focus:border-transparent"
+                    >
+                      <option value="DESC">Newest First</option>
+                      <option value="ASC">Oldest First</option>
+                    </select>
+                  </div>
+                </>
               )}
 
               {/* Date Range Filter */}

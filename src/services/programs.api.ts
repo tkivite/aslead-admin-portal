@@ -9,7 +9,7 @@ import type {
   CreateProgramCostData,
 } from "@/types/programs.types";
 
-const DEFAULT_PAGE_SIZE = 15;
+const DEFAULT_PAGE_SIZE = 10;
 
 export const programsService = {
   // Get all programs
@@ -26,9 +26,10 @@ export const programsService = {
     size = DEFAULT_PAGE_SIZE,
     filters?: {
       search?: string;
+      status?: string;
       sortBy?: string;
       sortDirection?: "ASC" | "DESC";
-    }
+    },
   ): Promise<ProgramPageResponse> => {
     let url = `/application/api/programs?page=${page}&size=${size}`;
 
@@ -41,6 +42,10 @@ export const programsService = {
     const sortBy = filters?.sortBy || "createdAt";
     const sortDirection = filters?.sortDirection || "DESC";
     url += `&sortby=${sortBy}&sortdirection=${sortDirection}`;
+
+    if (filters?.status) {
+      url += `&status=${encodeURIComponent(filters.status)}`;
+    }
 
     const response = await api.get<ApiResponse<ProgramPageResponse>>(url);
     return response.data.body;

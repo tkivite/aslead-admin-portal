@@ -31,6 +31,7 @@ export default function ProgramsPage() {
         pagination.size,
         {
           search: filters.search,
+          status: filters.status,
           sortBy: filters.sortBy || "createdAt",
           sortDirection: filters.sortDirection || "DESC",
         }
@@ -110,9 +111,14 @@ export default function ProgramsPage() {
           onFiltersChange={setFilters}
           showSearchFilter={true}
           showSortFilter={true}
+          showStatusFilter={true}
+          showDateRangeFilter={false}
           showCountryFilter={false}
           showCountyFilter={false}
-          showDateRangeFilter={false}
+          statusOptions={[
+            { value: "ACTIVE", label: "Active" },
+            { value: "INACTIVE", label: "Inactive" },
+          ]}
           sortOptions={[
             { value: "createdAt", label: "Created Date" },
             { value: "name", label: "Name" },
