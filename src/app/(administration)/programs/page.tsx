@@ -17,7 +17,7 @@ export default function ProgramsPage() {
     currentPage: 0,
     totalPages: 0,
     totalElements: 0,
-    size: 15,
+    size: 10,
   });
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
